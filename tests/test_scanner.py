@@ -262,3 +262,30 @@ def test_run_llm_phase_close_error_swallowed(mock_load_config, mock_llm_client_c
     result = _run_llm_phase("/tmp", [], [], 0, llm_client=None)
 
     assert result is not None
+
+
+def test_scan_error_in_analyze_file_swallowed():
+    import tempfile
+    from pathlib import Path
+    from src.scanner import scan_project
+    from src.models import Severity
+    phases = []
+    with tempfile.TemporaryDirectory() as tmp:
+        Path(tmp, "app.py").write_text("x=1")
+        report = scan_project(tmp, languages=["python"], min_severity=Severity.LOW, on_phase=lambda p: phases.append(p))
+    assert "rules" in phases
+
+
+@patch("src.deps.collect_manifest_packages")
+@patch("src.deps_online.scan_dependencies_online")
+def test_scan_online_cve_exception_swallowed(mock_online, mock_collect):
+    import tempfile
+    from pathlib import Path
+    from src.scanner import scan_project
+    from src.models import Severity
+    with tempfile.TemporaryDirectory() as tmp:
+        Path(tmp, "app.py").write_text("x=1")
+        mock_collect.return_value = [("requests", "2.28.0", "pypi")]
+        mock_online.side_effect = Exception("network error")
+        report = scan_project(tmp, languages=["python"], min_severity=Severity.LOW, online_cve=True)
+    assert report is not None

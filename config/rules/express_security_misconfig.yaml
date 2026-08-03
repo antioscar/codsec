@@ -1,0 +1,25 @@
+id: EXPRESSSEC-001
+category: express_security_misconfig
+severity: high
+cwe: "CWE-16"
+languages: [javascript, typescript]
+ast_node_types: []
+ast_function_names: []
+regex_patterns:
+  - '(?i)app\.disable\s*\(\s*[\x27"]x-powered-by[\x27"]'
+  - '(?i)(app|router)\.(use|get|post)\(.*(?<!helmet|auth|sanitize|cors|rateLimit)'
+  - '(?i)res\.send\s*\(\s*.*req\.(query|params|body)\.\w+(?!.*sanitize|escape)'
+  - '(?i)express\.json\s*\(\s*\)(?!.*limit)'
+  - '(?i)session\s*\(\s*\{[^}]*secret\s*:\s*[\x27"][\w]{1,15}[\x27"]'
+  - '(?i)cookie-parser\s*\(\s*[\x27"][\w]{1,15}[\x27"]'
+  - '(?i)CORS\(\)\.\(origin\s*:\s*true\s*,\s*credentials\s*:\s*true\)'
+  - '(?i)rateLimit\s*\(\s*\{[^}]*(?<!max|windowMs|window)'
+  - '(?i)morgan\s*\(\s*[\x27"]tiny[\x27"](?!.*skip)'
+description_template: "Configuración insegura de Express: falta de helmet, CORS permisivo, secretos débiles en sesiones"
+remediation: |
+  1. Usá helmet() middleware para headers de seguridad.
+  2. Configurá CORS con orígenes específicos y credenciales controladas.
+  3. Usá secretos fuertes (al menos 32 caracteres) para express-session y cookie-parser.
+  4. Implementá rate limiting con express-rate-limit.
+  5. Sanitizá la entrada del usuario antes de enviarla en respuestas.
+  6. Configurá express.json() con límite de tamaño máximo.

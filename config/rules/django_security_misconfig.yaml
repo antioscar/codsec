@@ -1,0 +1,33 @@
+id: DJANGOSEC-001
+category: django_security_misconfig
+severity: high
+cwe: "CWE-16"
+languages: [python]
+ast_node_types: []
+ast_function_names: []
+regex_patterns:
+  - '(?i)DEBUG\s*=\s*True'
+  - '(?i)SECRET_KEY\s*=\s*[\x27"]django-insecure-'
+  - '(?i)ALLOWED_HOSTS\s*=\s*\[\s*[\x27"]\*[\x27"]\s*\]'
+  - '(?i)SECURE_SSL_REDIRECT\s*=\s*False'
+  - '(?i)SESSION_COOKIE_SECURE\s*=\s*False'
+  - '(?i)CSRF_COOKIE_SECURE\s*=\s*False'
+  - '(?i)SECURE_HSTS_SECONDS\s*=\s*0'
+  - '(?i)SECURE_CONTENT_TYPE_NOSNIFF\s*=\s*False'
+  - '(?i)X_FRAME_OPTIONS\s*=\s*[\x27"]?ALLOW'
+  - '(?i)SECURE_BROWSER_XSS_FILTER\s*=\s*False'
+  - '(?i)SECURE_HSTS_INCLUDE_SUBDOMAINS\s*=\s*False'
+  - '(?i)SECURE_HSTS_PRELOAD\s*=\s*False'
+  - '(?i)@csrf_exempt'
+  - '(?i)SILENCED_SYSTEM_CHECKS\s*=\s*\[\s*[\x27"]security'
+  - '(?i)AUTH_PASSWORD_VALIDATORS\s*=\s*\[\s*\]'
+  - '(?i)PASSWORD_HASHERS\s*=\s*.*MD5PasswordHasher'
+description_template: "Configuración insegura de Django: DEBUG activo, ALLOWED_HOSTS wildcard, o flags de seguridad deshabilitados"
+remediation: |
+  1. DEBUG = False en producción.
+  2. ALLOWED_HOSTS debe contener solo los dominios de producción.
+  3. Activar SECURE_SSL_REDIRECT, SESSION_COOKIE_SECURE, CSRF_COOKIE_SECURE.
+  4. Configurar SECURE_HSTS_SECONDS (mínimo 31536000).
+  5. Generar SECRET_KEY fuerte, nunca usar la default de django-insecure-.
+  6. No usar @csrf_exempt sin razón justificada.
+  7. Configurar password validators y usar hashers seguros (bcrypt, argon2).

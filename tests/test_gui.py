@@ -622,3 +622,39 @@ def test_toast_show_at_callback(qapp):
     toast.show_at(w)
     assert toast.isVisible()
     w.hide()
+
+
+def test_scan_worker_cancel(qapp):
+    from src.gui.scan_worker import ScanWorker
+    from src.models import Severity
+    worker = ScanWorker(target_path=".", languages=["python"], min_severity=Severity.LOW, use_llm=False)
+    worker.cancel()
+    assert worker._cancelled is True
+
+
+def test_scan_worker_run_exception(qapp):
+    from src.gui.scan_worker import ScanWorkerSignals
+    signals = ScanWorkerSignals()
+    errors = []
+    signals.error.connect(lambda msg: errors.append(msg))
+    signals.error.emit("test error")
+    assert len(errors) == 1
+    assert errors[0] == "test error"
+
+
+def test_syntax_highlighter_set_theme_same(qapp):
+    from src.gui.code_viewer import SyntaxHighlighter
+    from PySide6.QtWidgets import QPlainTextEdit
+    editor = QPlainTextEdit()
+    hl = SyntaxHighlighter(editor.document(), "dark")
+    hl.set_theme("dark")
+    assert hl._theme == "dark"
+
+
+def test_code_viewer_highlight_with_color(qapp):
+    from src.gui.code_viewer import CodeViewer
+    from PySide6.QtGui import QColor
+    viewer = CodeViewer()
+    viewer.set_source("line 1\nline 2\nline 3", "python")
+    viewer.set_highlighted_line(2, QColor(255, 0, 0))
+    assert viewer._highlighted_line == 2

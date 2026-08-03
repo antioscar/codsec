@@ -209,7 +209,9 @@ def test_load_all_rules_count():
                 "nosql_injection", "insecure_random", "idor_access_control",
                 "unsafe_deserialization_advanced", "http_parameter_pollution",
                 "graphql_injection", "missing_auth", "unsafe_redirect",
-                "host_header_injection", "insecure_file_upload"}
+                "host_header_injection", "insecure_file_upload",
+                "spring_security_misconfig", "django_security_misconfig",
+                "express_security_misconfig", "laravel_security_misconfig"}
     assert categories == expected
 
 

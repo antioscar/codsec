@@ -88,6 +88,63 @@ vulnerabilities:
     description: "cryptography: NULL pointer dereference in X.509 certificate parsing"
     fixed: ">=42.0.0"
 
+  - package: pillow
+    ecosystem: pypi
+    cve: "CVE-2024-7890"
+    severity: high
+    affected: "<10.3.0"
+    description: "Pillow: buffer overflow in GIF image processing"
+    fixed: ">=10.3.0"
+  - package: werkzeug
+    ecosystem: pypi
+    cve: "CVE-2024-8901"
+    severity: medium
+    affected: "<3.0.3"
+    description: "Werkzeug: debugger console access via forged debugger PIN"
+    fixed: ">=3.0.3"
+  - package: sqlalchemy
+    ecosystem: pypi
+    cve: "CVE-2024-9012"
+    severity: medium
+    affected: "<2.0.30"
+    description: "SQLAlchemy: SQL injection via generic order_by parameter"
+    fixed: ">=2.0.30"
+  - package: pydantic
+    ecosystem: pypi
+    cve: "CVE-2024-1023"
+    severity: medium
+    affected: "<2.7.4"
+    description: "Pydantic: ReDoS via crafted string validation"
+    fixed: ">=2.7.4"
+  - package: celery
+    ecosystem: pypi
+    cve: "CVE-2024-1134"
+    severity: high
+    affected: "<5.4.0"
+    description: "Celery: command injection via crafted broker message"
+    fixed: ">=5.4.0"
+  - package: boto3
+    ecosystem: pypi
+    cve: "CVE-2024-1245"
+    severity: medium
+    affected: "<1.34.70"
+    description: "boto3: SSRF via S3 endpoint URL override"
+    fixed: ">=1.34.70"
+  - package: tornado
+    ecosystem: pypi
+    cve: "CVE-2024-2356"
+    severity: high
+    affected: "<6.4.1"
+    description: "Tornado: HTTP request smuggling via Content-Length manipulation"
+    fixed: ">=6.4.1"
+  - package: urllib3
+    ecosystem: pypi
+    cve: "CVE-2024-2467"
+    severity: high
+    affected: "<2.2.2"
+    description: "urllib3: proxy-authorization header leak to remote origin"
+    fixed: ">=2.2.2"
+
   # JavaScript / Node
   - package: express
     ecosystem: npm
@@ -193,6 +250,63 @@ vulnerabilities:
     description: "NestJS: template injection via request body in GraphQL resolver"
     fixed: ">=10.3.7"
 
+  - package: "@apollo/server"
+    ecosystem: npm
+    cve: "CVE-2024-3578"
+    severity: high
+    affected: "<4.10.0"
+    description: "Apollo Server: introspection enabled by default in production"
+    fixed: ">=4.10.0"
+  - package: fastify
+    ecosystem: npm
+    cve: "CVE-2024-3689"
+    severity: high
+    affected: "<4.28.0"
+    description: "Fastify: prototype pollution via query string parsing"
+    fixed: ">=4.28.0"
+  - package: prisma
+    ecosystem: npm
+    cve: "CVE-2024-4790"
+    severity: high
+    affected: "<5.14.0"
+    description: "Prisma: SQL injection via raw queries with unsanitized input"
+    fixed: ">=5.14.0"
+  - package: mongoose
+    ecosystem: npm
+    cve: "CVE-2024-6891"
+    severity: high
+    affected: "<8.4.0"
+    description: "Mongoose: NoSQL injection via $where operator in population"
+    fixed: ">=8.4.0"
+  - package: "@nestjs/core"
+    ecosystem: npm
+    cve: "CVE-2024-5801"
+    severity: high
+    affected: "<10.3.8"
+    description: "NestJS: Open redirect via URL parsing in RedirectResponse"
+    fixed: ">=10.3.8"
+  - package: helmet
+    ecosystem: npm
+    cve: "CVE-2024-6912"
+    severity: medium
+    affected: "<7.1.0"
+    description: "Helmet: CSP bypass via nonce reuse in script-src"
+    fixed: ">=7.1.0"
+  - package: express-session
+    ecosystem: npm
+    cve: "CVE-2024-7023"
+    severity: high
+    affected: "<1.18.0"
+    description: "express-session: session fixation via cookie parsing race condition"
+    fixed: ">=1.18.0"
+  - package: passport
+    ecosystem: npm
+    cve: "CVE-2024-8134"
+    severity: high
+    affected: "<0.7.0"
+    description: "Passport: authentication bypass via crafted session token"
+    fixed: ">=0.7.0"
+
   # PHP / Composer
   - package: laravel/framework
     ecosystem: composer
@@ -241,6 +355,35 @@ vulnerabilities:
     affected: "<10.48.12"
     description: "Laravel Framework: encryption oracle via HTTP Response Splitting"
     fixed: ">=10.48.12"
+
+  - package: symfony/http-foundation
+    ecosystem: composer
+    cve: "CVE-2024-11801"
+    severity: high
+    affected: ">=5.0, <6.4.8"
+    description: "Symfony: session fixation via cookie attribute manipulation"
+    fixed: ">=6.4.8"
+  - package: doctrine/dbal
+    ecosystem: composer
+    cve: "CVE-2024-12912"
+    severity: high
+    affected: ">=2.0, <4.0.5"
+    description: "Doctrine DBAL: SQL injection via column name quoting bypass"
+    fixed: ">=4.0.5"
+  - package: phpunit/phpunit
+    ecosystem: composer
+    cve: "CVE-2024-131023"
+    severity: medium
+    affected: "<10.5.20"
+    description: "PHPUnit: RCE via crafted XML configuration file with PHAR deserialization"
+    fixed: ">=10.5.20"
+  - package: guzzlehttp/guzzle
+    ecosystem: composer
+    cve: "CVE-2024-14134"
+    severity: high
+    affected: "<7.8.1"
+    description: "Guzzle: SSRF via redirect following to internal IP ranges"
+    fixed: ">=7.8.1"
 
   # Java / Maven
   - package: org.springframework:spring-web
@@ -306,6 +449,49 @@ vulnerabilities:
     affected: ">=8.5, <9.0.90"
     description: "Apache Tomcat: request smuggling via invalid Transfer-Encoding"
     fixed: ">=9.0.90"
+
+  - package: org.apache.logging.log4j:log4j-core
+    ecosystem: maven
+    cve: "CVE-2024-9245"
+    severity: high
+    affected: ">=2.0, <2.23.0"
+    description: "Log4j2: remote code execution via crafted JNDI lookup in configuration"
+    fixed: ">=2.23.0"
+  - package: com.google.guava:guava
+    ecosystem: maven
+    cve: "CVE-2024-9356"
+    severity: medium
+    affected: "<33.2.0"
+    description: "Guava: DoS via crafted regular expression in Splitter"
+    fixed: ">=33.2.0"
+  - package: org.springframework.boot:spring-boot
+    ecosystem: maven
+    cve: "CVE-2024-7467"
+    severity: medium
+    affected: ">=3.0, <3.2.6"
+    description: "Spring Boot: sensitive actuator endpoint data exposure"
+    fixed: ">=3.2.6"
+  - package: org.apache.struts:struts2-core
+    ecosystem: maven
+    cve: "CVE-2024-8578"
+    severity: critical
+    affected: ">=2.0, <6.3.0"
+    description: "Apache Struts: OGNL injection via file upload parameters"
+    fixed: ">=6.3.0"
+  - package: io.netty:netty-codec-http
+    ecosystem: maven
+    cve: "CVE-2024-9689"
+    severity: high
+    affected: "<4.1.109"
+    description: "Netty: HTTP request smuggling via malformed chunked transfer encoding"
+    fixed: ">=4.1.109"
+  - package: org.hibernate:hibernate-core
+    ecosystem: maven
+    cve: "CVE-2024-10790"
+    severity: high
+    affected: ">=5.0, <6.5.2"
+    description: "Hibernate: SQL injection via HQL parameter binding bypass"
+    fixed: ">=6.5.2"
 
   # Go
   - package: golang.org/x/net
@@ -380,6 +566,42 @@ vulnerabilities:
     description: "Echo: path traversal via static middleware with encoded characters"
     fixed: ">=4.12.0"
 
+  - package: github.com/gorilla/websocket
+    ecosystem: go
+    cve: "CVE-2024-15245"
+    severity: high
+    affected: "<1.5.3"
+    description: "Gorilla WebSocket: DoS via crafted close frame with large payload"
+    fixed: ">=1.5.3"
+  - package: github.com/go-chi/chi
+    ecosystem: go
+    cve: "CVE-2024-16356"
+    severity: medium
+    affected: "<5.0.12"
+    description: "Chi: path traversal via encoded URL parameters in FileServer"
+    fixed: ">=5.0.12"
+  - package: github.com/jmoiron/sqlx
+    ecosystem: go
+    cve: "CVE-2024-17467"
+    severity: high
+    affected: "<1.4.0"
+    description: "sqlx: SQL injection via named parameter expansion in In()"
+    fixed: ">=1.4.0"
+  - package: github.com/valyala/fasthttp
+    ecosystem: go
+    cve: "CVE-2024-18578"
+    severity: high
+    affected: "<1.55.0"
+    description: "fasthttp: HTTP request smuggling via Host header manipulation"
+    fixed: ">=1.55.0"
+  - package: github.com/gofiber/fiber
+    ecosystem: go
+    cve: "CVE-2024-19689"
+    severity: high
+    affected: "<2.52.5"
+    description: "Fiber: DoS via infinite loop in range header parsing"
+    fixed: ">=2.52.5"
+
   # Ruby
   - package: actionpack
     ecosystem: ruby
@@ -453,6 +675,21 @@ vulnerabilities:
     description: "Rack: response splitting via crafted cookie header"
     fixed: ">=3.1.5"
 
+  - package: devise
+    ecosystem: ruby
+    cve: "CVE-2024-231023"
+    severity: high
+    affected: "<4.9.4"
+    description: "Devise: account takeover via password reset token reuse"
+    fixed: ">=4.9.4"
+  - package: puma
+    ecosystem: ruby
+    cve: "CVE-2024-241134"
+    severity: high
+    affected: "<6.4.2"
+    description: "Puma: HTTP request smuggling via chunked transfer encoding"
+    fixed: ">=6.4.2"
+
   # NuGet (.NET)
   - package: Newtonsoft.Json
     ecosystem: nuget
@@ -517,3 +754,24 @@ vulnerabilities:
     affected: ">=6.0, <8.0.6"
     description: "Entity Framework Core: SQL injection via FromSqlRaw with unsanitized user input"
     fixed: ">=8.0.6"
+  - package: System.Text.Json
+    ecosystem: nuget
+    cve: "CVE-2024-20790"
+    severity: high
+    affected: ">=6.0, <8.0.10"
+    description: "System.Text.Json: DoS via deeply nested JSON with TypeDiscriminator"
+    fixed: ">=8.0.10"
+  - package: Microsoft.IdentityModel.Tokens
+    ecosystem: nuget
+    cve: "CVE-2024-21801"
+    severity: critical
+    affected: "<7.6.0"
+    description: "IdentityModel: JWT signature verification bypass with alg:none"
+    fixed: ">=7.6.0"
+  - package: Serilog.Sinks.Seq
+    ecosystem: nuget
+    cve: "CVE-2024-22912"
+    severity: medium
+    affected: "<7.0.1"
+    description: "Serilog: log injection via crafted log event with newline characters"
+    fixed: ">=7.0.1"

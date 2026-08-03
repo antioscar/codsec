@@ -1,0 +1,25 @@
+id: SPRINGSEC-001
+category: spring_security_misconfig
+severity: high
+cwe: "CWE-16"
+languages: [java, kotlin]
+ast_node_types: []
+ast_function_names: []
+regex_patterns:
+  - '(?i)\.csrf\(\)\.disable\s*\('
+  - '(?i)\.cors\(\)\.disable\s*\('
+  - '(?i)\.authorizeHttpRequests\s*\(.*\.anyRequest\(\)\.permitAll\(\)'
+  - '(?i)\.headers\(\)\.frameOptions\(\)\.disable\s*\('
+  - '(?i)csrf\(\)\.ignoringAntMatchers\s*\('
+  - '(?i)@EnableWebSecurity(?!.*@EnableMethodSecurity)'
+  - '(?i)security\.basic\.enabled\s*=\s*false'
+  - '(?i)management\.endpoints\.web\.exposure\.include\s*=\s*\*'
+  - '(?i)management\.endpoint\.health\.show-details\s*=\s*always'
+description_template: "Configuración insegura de Spring Security detectada: CSRF/CORS deshabilitado o endpoints sin protección"
+remediation: |
+  1. No deshabilites CSRF a menos que sea una API stateless con JWT.
+  2. Configura CORS con orígenes específicos, no con .permitAll().
+  3. Usa @PreAuthorize en lugar de .permitAll() para endpoints sensibles.
+  4. Habilita frameOptions para prevenir clickjacking.
+  5. Exponé solo endpoints de actuator necesarios, nunca "*".
+  6. Usa @EnableMethodSecurity para seguridad a nivel de método.

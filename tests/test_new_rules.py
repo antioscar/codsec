@@ -364,3 +364,68 @@ def test_insecure_file_upload_python():
         findings = analyze_file(file_path, "python", rules)
         upload = [f for f in findings if f.category == "insecure_file_upload"]
         assert len(upload) >= 1, f"Expected insecure_file_upload finding, got {[f.category for f in findings]}"
+
+
+def test_spring_security_misconfig_java():
+    with tempfile.TemporaryDirectory() as tmp:
+        file_path = str(Path(tmp, "SecurityConfig.java"))
+        Path(file_path).write_text(
+            '@Configuration\n'
+            '@EnableWebSecurity\n'
+            'public class SecurityConfig {\n'
+            '  protected void configure(HttpSecurity http) {\n'
+            '    http.csrf().disable().authorizeHttpRequests().anyRequest().permitAll();\n'
+            '  }\n'
+            '}\n'
+        )
+        rules = load_rules()
+        findings = analyze_file(file_path, "java", rules)
+        spring = [f for f in findings if f.category == "spring_security_misconfig"]
+        assert len(spring) >= 1, f"Expected spring_security_misconfig finding, got {[f.category for f in findings]}"
+
+
+def test_django_security_misconfig():
+    with tempfile.TemporaryDirectory() as tmp:
+        file_path = str(Path(tmp, "settings.py"))
+        Path(file_path).write_text(
+            'DEBUG = True\n'
+            'ALLOWED_HOSTS = ["*"]\n'
+            'SECURE_SSL_REDIRECT = False\n'
+        )
+        rules = load_rules()
+        findings = analyze_file(file_path, "python", rules)
+        django = [f for f in findings if f.category == "django_security_misconfig"]
+        assert len(django) >= 1, f"Expected django_security_misconfig finding, got {[f.category for f in findings]}"
+
+
+def test_express_security_misconfig():
+    with tempfile.TemporaryDirectory() as tmp:
+        file_path = str(Path(tmp, "app.js"))
+        Path(file_path).write_text(
+            'const express = require("express");\n'
+            'const app = express();\n'
+            'app.get("/data", (req, res) => {\n'
+            '    res.send(req.query.data);\n'
+            '});\n'
+        )
+        rules = load_rules()
+        findings = analyze_file(file_path, "javascript", rules)
+        express_findings = [f for f in findings if f.category == "express_security_misconfig"]
+        assert len(express_findings) >= 1, f"Expected express_security_misconfig finding, got {[f.category for f in findings]}"
+
+
+def test_laravel_security_misconfig():
+    with tempfile.TemporaryDirectory() as tmp:
+        file_path = str(Path(tmp, "app.php"))
+        Path(file_path).write_text(
+            '<?php\n'
+            'class Kernel {\n'
+            '  public function boot() {\n'
+            '    $this->withoutMiddleware();\n'
+            '  }\n'
+            '}\n'
+        )
+        rules = load_rules()
+        findings = analyze_file(file_path, "php", rules)
+        laravel = [f for f in findings if f.category == "laravel_security_misconfig"]
+        assert len(laravel) >= 1, f"Expected laravel_security_misconfig finding, got {[f.category for f in findings]}"

@@ -1,0 +1,29 @@
+id: LARAVELSEC-001
+category: laravel_security_misconfig
+severity: high
+cwe: "CWE-16"
+languages: [php]
+ast_node_types: []
+ast_function_names: []
+regex_patterns:
+  - '(?i)APP_DEBUG\s*=\s*true'
+  - '(?i)APP_ENV\s*=\s*local'
+  - '(?i)APP_KEY\s*=\s*[^=\n]{1,20}'
+  - '(?i)SANCTUM_STATEFUL_DOMAINS\s*=\s*\*'
+  - '(?i)SESSION_SECURE_COOKIE\s*=\s*false'
+  - '(?i)CSRF_COOKIE_HTTP_ONLY\s*=\s*false'
+  - '(?i)CORS_ALLOWED_ORIGINS\s*=\s*[\x27"]\*[\x27"]'
+  - '(?i)DEBUGBAR_ENABLED\s*=\s*true'
+  - '(?i)TELESCOPE_ENABLED\s*=\s*true'
+  - '(?i)IGNITION_ENABLED\s*=\s*true'
+  - '(?i)->withoutMiddleware\s*\('
+  - '(?i)hasMany|hasOne|belongsTo.*where\s*\(\s*[\x27"]\w+[\x27"]\s*,\s*request\s*\('
+description_template: "Configuración insegura de Laravel: APP_DEBUG activo, APP_KEY débil, o middleware de seguridad ausente"
+remediation: |
+  1. APP_DEBUG=false, APP_ENV=production en producción.
+  2. Generar APP_KEY fuerte con php artisan key:generate.
+  3. Configurar SANCTUM_STATEFUL_DOMAINS con dominios específicos.
+  4. Activar SESSION_SECURE_COOKIE=true en HTTPS.
+  5. No usar ->withoutMiddleware() sin razón justificada.
+  6. Deshabilitar debugbar, telescope e ignition en producción.
+  7. Validar la propiedad de los recursos en relaciones de Eloquent.
