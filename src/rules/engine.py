@@ -6,7 +6,7 @@ from typing import Optional
 import yaml
 
 from src.models import Rule, Severity, Finding
-from src.rules.parser import parse_file, find_function_calls, ParsedFile, mask_comments
+from src.rules.parser import parse_file, find_function_calls, ParsedFile
 from src.rules.regex_rules import apply_regex_rule
 from src.rules.taint import run_taint_analysis
 from src.rules.suppression import collect_suppressions, apply_suppressions
@@ -118,16 +118,14 @@ def analyze_file(
         with open(file_path, "r", encoding="utf-8", errors="replace") as f:
             source_text = f.read()
         lines = source_text.split("\n")
-        masked_text = source_text
     else:
         source_text = parsed.source.decode("utf-8", errors="replace")
         lines = parsed.lines
-        masked_text = mask_comments(parsed)
 
     applicable_rules = [r for r in rules if language in r.languages]
 
     for rule in applicable_rules:
-        regex_findings = apply_regex_rule(rule, file_path, language, lines, masked_text)
+        regex_findings = apply_regex_rule(rule, file_path, language, lines, source_text, parsed.root_node if parsed else None)
         findings.extend(regex_findings)
 
     if parsed and any(r.ast_function_names for r in applicable_rules):

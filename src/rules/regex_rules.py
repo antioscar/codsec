@@ -1,6 +1,7 @@
 from __future__ import annotations
 import os
 import re
+from tree_sitter import Node
 from src.models import Rule, Finding, Severity
 
 _FALSE_POSITIVE_SECRET_VALUES = re.compile(
@@ -14,12 +15,52 @@ def _is_false_positive_secret(matched_text: str) -> bool:
     return False
 
 
+def _find_containing_string_node(node: Node | None, byte_pos: int) -> Node | None:
+    if node is None:
+        return None
+    node_type = node.type
+    if ("string" in node_type or node_type in (
+        "string_literal", "raw_string_literal", "interpreted_string_literal",
+        "encapsed_string", "heredoc", "template_string", "template_literal",
+    )) and node.start_byte <= byte_pos <= node.end_byte:
+        return node
+    for child in node.children:
+        result = _find_containing_string_node(child, byte_pos)
+        if result:
+            return result
+    return None
+
+
+def _is_in_string_or_comment(node: Node | None, start_byte: int, end_byte: int) -> bool:
+    """Check if a byte range falls inside a string or comment AST node."""
+    if node is None:
+        return False
+    node_type = node.type
+    if node_type in ("comment", "block_comment", "line_comment") or "comment" in node_type:
+        if node.start_byte <= start_byte and node.end_byte >= end_byte:
+            return True
+    if "string" in node_type or node_type in (
+        "string_literal", "string_content", "template_string",
+        "template_literal", "raw_string_literal", "interpreted_string_literal",
+        "encapsed_string", "heredoc", "heredoc_body", "nowdoc_body",
+        "charliteral", "character_literal", "string_fragment",
+    ):
+        if node.start_byte <= start_byte and node.end_byte >= end_byte:
+            return True
+
+    for child in node.children:
+        if _is_in_string_or_comment(child, start_byte, end_byte):
+            return True
+    return False
+
+
 def apply_regex_rule(
     rule: Rule,
     file_path: str,
     language: str,
     lines: list[str],
     source_text: str,
+    parsed_root: Node | None = None,
 ) -> list[Finding]:
     findings: list[Finding] = []
     counter = 0
@@ -42,6 +83,14 @@ def apply_regex_rule(
             line_number = source_text[: match.start()].count("\n") + 1
             line_idx = line_number - 1
             line_text = lines[line_idx] if line_idx < len(lines) else ""
+
+            if parsed_root is not None and rule.category == "hardcoded_secrets":
+                match_start_byte = match.start()
+                match_end_byte = match.end()
+                if _is_in_string_or_comment(parsed_root, match_start_byte, match_end_byte):
+                    node = _find_containing_string_node(parsed_root, match_start_byte)
+                    if node and node.end_byte - node.start_byte > 100:
+                        continue
 
             if rule.category in ("hardcoded_secrets", "info_disclosure"):
                 if "/test/" in file_path or os.path.basename(file_path).startswith("test_"):
