@@ -293,6 +293,11 @@ kotlin:
     - '@RequestParam'
     - '@PathVariable'
     - '@RequestBody'
+    - 'request\.formParameters\b'
+    - 'call\.parameters\b'
+    - 'request\.bodyAsText'
+    - 'request\.receiveText'
+    - 'request\.cookies\['
   sinks:
     - executeQuery
     - executeUpdate
@@ -305,6 +310,11 @@ kotlin:
     - sendRedirect
     - write
     - load
+    - executeBatch
+    - createStatement
+    - createNativeQuery
+    - launch
+    - runBlocking
 
 swift:
   sources:
@@ -315,6 +325,11 @@ swift:
     - 'request\.body\b'
     - 'readLine\(\)'
     - 'Console\.readLine'
+    - 'request\.body\.bytes\b'
+    - 'request\.decodeBody'
+    - 'request\.getParam\b'
+    - 'request\.queryParams\b'
+    - 'request\.pathComponents\b'
   sinks:
     - execute
     - query
@@ -323,6 +338,12 @@ swift:
     - open
     - write
     - load
+    - launch
+    - prepare
+    - run
+    - fetch
+    - executeQuery
+    - executeUpdate
 
 rust:
   sources:
@@ -335,6 +356,12 @@ rust:
     - 'query\.get\(\)'
     - 'std::io::stdin'
     - 'read_line\(\)'
+    - 'req\.query_string\(\)'
+    - 'req\.param\b'
+    - 'payload\.into_inner\(\)'
+    - 'web::Json'
+    - 'web::Query'
+    - 'actix_web::web::Json'
   sinks:
     - execute
     - query
@@ -347,3 +374,7 @@ rust:
     - command
     - spawn
     - redirect
+    - query_as
+    - fetch_one
+    - fetch_all
+    - execute_batch

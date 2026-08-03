@@ -16,6 +16,7 @@ ALL_RULE_CATEGORIES = [
     "dynamic_exec", "open_redirect", "csrf", "security_headers",
     "info_disclosure", "ssti", "xxe", "ldap_injection",
     "prototype_pollution", "log_injection", "zip_slip", "weak_hash",
+    "cors_misconfiguration", "cookie_security", "insecure_jwt",
 ]
 
 

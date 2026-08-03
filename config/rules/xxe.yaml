@@ -3,32 +3,39 @@ category: xxe
 severity: critical
 cwe: CWE-611
 languages:
-  - python
-  - javascript
-  - typescript
-  - php
-  - java
-  - csharp
-  - kotlin
-  - swift
-  - rust
+- python
+- javascript
+- typescript
+- php
+- java
+- csharp
+- kotlin
+- swift
+- rust
 ast_function_names:
-  - parse
-  - fromstring
-  - XMLParser
-  - loadXML
+- parse
+- fromstring
+- XMLParser
+- loadXML
 regex_patterns:
-  - (?i)\.fromstring\s*\(
-  - (?i)\.ElementTree\.parse\s*\(
-  - (?i)minidom\.parse\s*\(
-  - (?i)XMLParser\s*\(
-  - (?i)loadXML\s*\(
-  - (?i)DocumentBuilderFactory\.newInstance\s*\(
-  - (?i)XmlReader\.Create\s*\(
-  - (?i)LOADXML\s*\(
-  - (?i)simplexml_load_string\s*\(
-  - (?i)libxml_disable_entity_loader\s*\(\s*false\s*\)
-description_template: "Posible XXE (XML External Entity): parser XML configurado para permitir entidades externas"
+- (?i)\.fromstring\s*\(
+- (?i)\.ElementTree\.parse\s*\(
+- (?i)minidom\.parse\s*\(
+- (?i)XMLParser\s*\(
+- (?i)loadXML\s*\(
+- (?i)DocumentBuilderFactory\.newInstance\s*\(
+- (?i)XmlReader\.Create\s*\(
+- (?i)LOADXML\s*\(
+- (?i)simplexml_load_string\s*\(
+- (?i)libxml_disable_entity_loader\s*\(\s*false\s*\)
+- (?i)(etree\.(parse|XML)|xml\.(Unmarshal|NewDecoder|Read))\s*\(
+- '(?i)Nokogiri::XML\s*\('
+- '(?i)XMLParser\(contentsOf:|Foundation\.XMLParser'
+- (?i)(javax\.xml\.parsers\.DocumentBuilder\.parse|SAXParser\.parse)\s*\(
+- (?i)xml_rs.*reader.*from_str|roxmltree.*parse
+- (?i)xml2js\.parseString\s*\(
+- (?i)XmlSerializer.*Deserialize\s*\(
+description_template: 'Posible XXE (XML External Entity): parser XML configurado para permitir entidades externas'
 remediation: |
   1. Deshabilitá entidades externas en el parser XML:
      - Python lxml: usar etree.XMLParser(resolve_entities=False)

@@ -3,27 +3,27 @@ category: ldap_injection
 severity: high
 cwe: CWE-90
 languages:
-  - python
-  - java
-  - kotlin
-  - javascript
-  - typescript
-  - php
+- python
+- java
+- kotlin
+- javascript
+- typescript
+- php
 ast_function_names:
-  - search
-  - search_s
-  - search_ext
-  - search_ext_s
-  - mod_s
-  - add_s
+- search
+- search_s
+- search_ext
+- search_ext_s
+- mod_s
+- add_s
 regex_patterns:
-  - (?i)ldap.*search\s*\(.*(\+|f["']|\.format|concat|sprintf)
-  - (?i)DirContext.*\.search\s*\(.*(\+|concat)
-  - (?i)ldap_search\s*\(.*\$
-  - (?i)ldapjs.*search\s*\(.*req
-  - (?i)ldap.*filter.*\+.*req
-  - (?i)\.search_?s?\(\s*[^)]*\b(request|input|param|get|post)
-description_template: "Posible LDAP injection: entrada de usuario usada en filtro LDAP sin escape"
+- '(?i)ldap.*search\s*\(.*(\+|f["'']|\.format|concat|sprintf)'
+- (?i)DirContext.*\.search\s*\(.*(\+|concat)
+- (?i)ldap_search\s*\(.*\$
+- (?i)ldapjs.*search\s*\(.*req
+- (?i)ldap.*filter.*\+.*req
+- '(?i)\.search_?s?\(\s*[^)]*\b(request|input|param|get|post)'
+description_template: 'Posible LDAP injection: entrada de usuario usada en filtro LDAP sin escape'
 remediation: |
   1. Escapá los caracteres especiales de LDAP antes de construir filtros:
      - Caracteres a escapar: * ( ) \ NUL / + ; , = < >

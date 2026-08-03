@@ -54,3 +54,6 @@ enabled_rules:
   - log_injection
   - zip_slip
   - weak_hash
+  - cors_misconfiguration
+  - cookie_security
+  - insecure_jwt

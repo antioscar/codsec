@@ -1,0 +1,36 @@
+id: JWT-001
+category: insecure_jwt
+severity: critical
+cwe: CWE-347
+languages:
+- python
+- javascript
+- typescript
+- php
+- java
+- go
+- csharp
+- ruby
+- kotlin
+- swift
+- rust
+ast_node_types: []
+ast_function_names:
+- jwt.decode
+- jwt.verify
+- decode
+- verify
+- validateToken
+regex_patterns:
+- '(?i)jwt\.decode\s*\([^,]*,\s*[''\"](secret|password|key|123|test)[''\"]'
+- '(?i)\.decode\s*\(.*,\s*\{[^}]*algorithms\s*:\s*\[\s*[''\"]none[''\"]'
+- '(?i)algorithms\s*=\s*\[\s*[''\"]none[''\"]'
+- '(?i)jwt\.sign\s*\(.*,?\s*[''\"](secret|password|key|123456)[''\"]'
+- '(?i)JWT_SECRET\s*=\s*[''\"][^''\"]{1,10}[''\"]'
+- (?i)\.signWith\s*\(.*\b(secret|password|key|token).*\)
+description_template: 'Configuracion insegura de JWT: secret debil, algoritmo none permitido, o falta validacion de firma'
+remediation: |
+  1. Usa secretos JWT fuertes de al menos 256 bits.
+  2. Especifica el algoritmo explicitamente: jwt.decode(token, secret, algorithms=['HS256']).
+  3. NUNCA permitas el algoritmo none.
+  4. Usa algoritmos asimetricos (RS256, ES256) cuando sea posible.

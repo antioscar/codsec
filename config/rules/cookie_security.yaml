@@ -1,0 +1,32 @@
+id: COOKIE-001
+category: cookie_security
+severity: medium
+cwe: CWE-614
+languages:
+- python
+- javascript
+- typescript
+- php
+- java
+- go
+- csharp
+- ruby
+- kotlin
+- swift
+- rust
+ast_node_types: []
+ast_function_names: []
+regex_patterns:
+- (?i)SESSION_COOKIE_SECURE\s*=\s*False
+- (?i)SESSION_COOKIE_HTTPONLY\s*=\s*False
+- (?i)CSRF_COOKIE_SECURE\s*=\s*False
+- '(?i)setcookie\s*\(\s*[^,)]*(?<!httponly)(?<!secure)'
+- '(?i)set_cookie\s*\(\s*[^,)]*(?<!HttpOnly)(?<!Secure)'
+- '(?i)res\.cookie\s*\(\s*[^,)]*(?<!httpOnly)(?<!secure)'
+- '(?i)http\.Cookie\s*\{[^}]*(?<!HttpOnly)(?<!Secure)'
+- '(?i)NewCookie\s*\(\s*[^)]*(?<!HttpOnly)(?<!Secure)'
+description_template: 'Cookie configurada sin flags de seguridad: faltan HttpOnly, Secure o SameSite'
+remediation: |
+  1. Agrega flags de seguridad: HttpOnly (anti-XSS), Secure (solo HTTPS), SameSite=Strict|Lax (anti-CSRF).
+  2. Django: SESSION_COOKIE_SECURE=True, SESSION_COOKIE_HTTPONLY=True.
+  3. Express: res.cookie(name, value, { httpOnly: true, secure: true, sameSite: 'strict' }).

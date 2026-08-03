@@ -1,0 +1,33 @@
+id: CORS-001
+category: cors_misconfiguration
+severity: high
+cwe: CWE-942
+languages:
+- python
+- javascript
+- typescript
+- php
+- java
+- go
+- csharp
+- ruby
+- kotlin
+- swift
+- rust
+ast_node_types: []
+ast_function_names: []
+regex_patterns:
+- '(?i)Access-Control-Allow-Origin\s*:\s*\*\s*[,;]'
+- '(?i)res\.(header|setHeader)\s*\(\s*[''\"]Access-Control-Allow-Origin[''\"]\s*,\s*[''\"]*[''\"]'
+- (?i)CORS_ALLOW_ALL_ORIGINS\s*=\s*True
+- '(?i)allow_credentials\s*:\s*True.*allow_origins\s*:\s*\[\s*[''\"]\*[''\"]'
+- '(?i)Access-Control-Allow-Credentials\s*:\s*true.*Access-Control-Allow-Origin\s*:\s*\*'
+- '(?i)cors\(\)\s*\(\s*\{[^}]*origin\s*:\s*[''\"]\*[''\"][^}]*credentials\s*:\s*true'
+- '(?i)addCorsMappings\s*\(.*allowedOrigins\s*\(\s*[''\"]\*[''\"]'
+- '(?i)add_header\s+[''\"]Access-Control-Allow-Origin[''\"]\s+[''\"]*[''\"]\s*always'
+- '(?i)header\(\s*[''\"]Access-Control-Allow-Origin[''\"]\s*,\s*[''\"]*\s*[''\"]\s*\)'
+description_template: 'Posible CORS mal configurado: Access-Control-Allow-Origin * con credentials activas'
+remediation: |
+  1. No combines Access-Control-Allow-Origin: * con Access-Control-Allow-Credentials: true.
+  2. Especifica los origenes permitidos en una whitelist.
+  3. Valida el header Origin contra la whitelist antes de reflejarlo.

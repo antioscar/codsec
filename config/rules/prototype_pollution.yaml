@@ -3,24 +3,24 @@ category: prototype_pollution
 severity: high
 cwe: CWE-1321
 languages:
-  - javascript
-  - typescript
+- javascript
+- typescript
 ast_function_names:
-  - merge
-  - extend
-  - defaultsDeep
-  - defaults
-  - cloneDeep
-  - __proto__
+- merge
+- extend
+- defaultsDeep
+- defaults
+- cloneDeep
+- __proto__
 regex_patterns:
-  - (?i)\.merge\s*\([^)]*\b(request\.(body|query|params)|req\.(body|query|params)|input)
-  - (?i)\.extend\s*\([^)]*\b(request\.(body|query|params)|req\.(body|query|params))
-  - (?i)\.defaultsDeep\s*\([^)]*\b(req(uest)?\.(body|query|params))
-  - (?i)_.merge\s*\(.*req
-  - (?i)Object\.assign\s*\([^)]*\b(request\.(body|query|params)|req)
-  - (?i)lodash.*merge\s*\(.*req
-  - (?i)\.assign\s*\([^)]*\b(__proto__|constructor|prototype)
-description_template: "Posible prototype pollution: `{func_name}()` recibe datos de usuario no controlados"
+- '(?i)\.merge\s*\([^)]*\b(request\.(body|query|params)|req\.(body|query|params)|input)'
+- '(?i)\.extend\s*\([^)]*\b(request\.(body|query|params)|req\.(body|query|params))'
+- '(?i)\.defaultsDeep\s*\([^)]*\b(req(uest)?\.(body|query|params))'
+- (?i)_.merge\s*\(.*req
+- '(?i)Object\.assign\s*\([^)]*\b(request\.(body|query|params)|req)'
+- (?i)lodash.*merge\s*\(.*req
+- '(?i)\.assign\s*\([^)]*\b(__proto__|constructor|prototype)'
+description_template: 'Posible prototype pollution: `{func_name}()` recibe datos de usuario no controlados'
 remediation: |
   1. Usá Object.create(null) para crear objetos sin prototype chain.
   2. Congelá Object.prototype: Object.freeze(Object.prototype).

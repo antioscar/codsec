@@ -1,25 +1,46 @@
-id: PATH-001
+id: 'PATH-001'
 category: path_traversal
 severity: high
-cwe: "CWE-22"
-description_template: "Posible path traversal: construcción de rutas de archivo con input de usuario"
-remediation: |
-  1. No uses input de usuario directamente para construir rutas de archivo.
+cwe: 'CWE-22'
+description_template: 'Posible path traversal: construcción de rutas de archivo con input de usuario'
+remediation: '1. No uses input de usuario directamente para construir rutas de archivo.
+
   2. Usa `os.path.basename()` para sanitizar nombres de archivo.
+
   3. Normaliza y valida la ruta resultante contra un directorio base permitido.
+
   4. Python: `os.path.realpath()` y verifica que esté dentro del directorio permitido.
+
   5. JS: `path.resolve()` y verifica que no escape del directorio base.
+
   6. Usa whitelists de nombres de archivo permitidos en lugar de blacklists de caracteres peligrosos.
 
-languages: [python, javascript, typescript, php, java, go, csharp, ruby, kotlin, swift, rust]
-
+  '
+languages:
+- python
+- javascript
+- typescript
+- php
+- java
+- go
+- csharp
+- ruby
+- kotlin
+- swift
+- rust
 ast_node_types: []
-
 ast_function_names: []
-
 regex_patterns:
-  - '(?i)(open|file)\s*\(\s*.*request\.(GET|POST|args|form|files|query|params)'
-  - '(?i)fs\.readFile\s*\(\s*.*req\.(params|query|body)'
-  - '(?i)import\s+os\s*\n.*\.join\s*\(.*request\.'
-  - '(?i)(fopen|file_get_contents|include|require)\s*\(.*\$_(GET|POST|REQUEST)'
-  - '(?i)new\s+File\s*\(\s*.*request\.getParameter'
+- '(?i)(open|file)\s*\(\s*.*request\.(GET|POST|args|form|files|query|params)'
+- '(?i)fs\.readFile\s*\(\s*.*req\.(params|query|body)'
+- '(?i)import\s+os\s*\n.*\.join\s*\(.*request\.'
+- '(?i)(fopen|file_get_contents|include|require)\s*\(.*\$_(GET|POST|REQUEST)'
+- '(?i)new\s+File\s*\(\s*.*request\.getParameter'
+- '(?i)os\.Open\s*\(\s*.*r\.(FormValue|PostFormValue|URL\.Query)'
+- '(?i)f, err := os\.Open\s*\(\s*'
+- '(?i)(File\.Open|File\.ReadAllText|File\.ReadAllBytes)\s*\(.*Request\.'
+- '(?i)(File\(|open\()\s*.*params\['
+- '(?i)java\.nio\.file\.(Files|Paths).*\.read.*request\.getParameter'
+- '(?i)(FileReader|FileInputStream|BufferedReader)\s*\(.*request\.getParameter'
+- '(?i)std::fs::(read|read_to_string|File::open)\s*\(.*format!'
+- '(?i)NSData\(contentsOf:|NSString\(contentsOfFile:).*request'

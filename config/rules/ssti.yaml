@@ -3,34 +3,34 @@ category: ssti
 severity: critical
 cwe: CWE-1336
 languages:
-  - python
-  - javascript
-  - typescript
-  - php
-  - go
-  - kotlin
+- python
+- javascript
+- typescript
+- php
+- go
+- kotlin
 ast_function_names:
-  - render_template_string
-  - Template
-  - ejs.render
-  - compile
-  - res.render
-  - mustache.render
-  - nunjucks.render
-  - pug.compile
-  - twig.render
+- render_template_string
+- Template
+- ejs.render
+- compile
+- res.render
+- mustache.render
+- nunjucks.render
+- pug.compile
+- twig.render
 regex_patterns:
-  - (?i)render_template_string\(
-  - (?i)(?<!lib)template\s*\(
-  - (?i)\.render\s*\(\s*.*req(uest)?
-  - (?i)\.compile\s*\(\s*.*\+\s*
-  - (?i)ejs\.render\s*\(
-  - (?i)mustache\.render\s*\(
-  - (?i)nunjucks\.render\s*\(
-  - (?i)pug\.compile\s*\(
-  - (?i)twig_loader.*render
-  - (?i)html/template.*Execute
-description_template: "Posible Server-Side Template Injection (SSTI): entrada de usuario interpolada en plantilla sin sanitización"
+- (?i)render_template_string\(
+- (?i)(?<!lib)template\s*\(
+- (?i)\.render\s*\(\s*.*req(uest)?
+- (?i)\.compile\s*\(\s*.*\+\s*
+- (?i)ejs\.render\s*\(
+- (?i)mustache\.render\s*\(
+- (?i)nunjucks\.render\s*\(
+- (?i)pug\.compile\s*\(
+- (?i)twig_loader.*render
+- (?i)html/template.*Execute
+description_template: 'Posible Server-Side Template Injection (SSTI): entrada de usuario interpolada en plantilla sin sanitización'
 remediation: |
   1. Nunca uses render_template_string() con datos de usuario directamente.
   2. Pasa los datos como variables de contexto, no como parte del template.

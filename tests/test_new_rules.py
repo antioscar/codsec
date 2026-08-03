@@ -120,3 +120,83 @@ def test_ldap_injection_php():
         findings = analyze_file(file_path, "php", rules)
         ldap_findings = [f for f in findings if f.category == "ldap_injection"]
         assert len(ldap_findings) >= 1, f"Expected ldap_injection finding, got {[f.category for f in findings]}"
+
+
+def test_cors_misconfiguration_javascript():
+    with tempfile.TemporaryDirectory() as tmp:
+        file_path = str(Path(tmp, "app.js"))
+        Path(file_path).write_text(
+            'app.get("/api", (req, res) => {\n'
+            '    res.header("Access-Control-Allow-Origin", "*");\n'
+            '    res.send("ok");\n'
+            '});\n'
+        )
+        rules = load_rules()
+        findings = analyze_file(file_path, "javascript", rules)
+        cors_findings = [f for f in findings if f.category == "cors_misconfiguration"]
+        assert len(cors_findings) >= 1, f"Expected cors_misconfiguration finding, got {[f.category for f in findings]}"
+
+
+def test_cors_misconfiguration_python():
+    with tempfile.TemporaryDirectory() as tmp:
+        file_path = str(Path(tmp, "app.py"))
+        Path(file_path).write_text(
+            'CORS_ALLOW_ALL_ORIGINS = True\n'
+        )
+        rules = load_rules()
+        findings = analyze_file(file_path, "python", rules)
+        cors_findings = [f for f in findings if f.category == "cors_misconfiguration"]
+        assert len(cors_findings) >= 1, f"Expected cors finding, got {[f.category for f in findings]}"
+
+
+def test_cookie_security_php():
+    with tempfile.TemporaryDirectory() as tmp:
+        file_path = str(Path(tmp, "app.php"))
+        Path(file_path).write_text(
+            '<?php\n'
+            'setcookie("session", $value, time()+3600, "/");\n'
+            '?>\n'
+        )
+        rules = load_rules()
+        findings = analyze_file(file_path, "php", rules)
+        cookie_findings = [f for f in findings if f.category == "cookie_security"]
+        assert len(cookie_findings) >= 1, f"Expected cookie_security finding, got {[f.category for f in findings]}"
+
+
+def test_cookie_security_django():
+    with tempfile.TemporaryDirectory() as tmp:
+        file_path = str(Path(tmp, "settings.py"))
+        Path(file_path).write_text(
+            'SESSION_COOKIE_SECURE = False\n'
+            'SESSION_COOKIE_HTTPONLY = False\n'
+        )
+        rules = load_rules()
+        findings = analyze_file(file_path, "python", rules)
+        cookie_findings = [f for f in findings if f.category == "cookie_security"]
+        assert len(cookie_findings) >= 1, f"Expected cookie finding, got {[f.category for f in findings]}"
+
+
+def test_insecure_jwt_python():
+    with tempfile.TemporaryDirectory() as tmp:
+        file_path = str(Path(tmp, "app.py"))
+        Path(file_path).write_text(
+            'import jwt\n'
+            'def verify(token):\n'
+            '    return jwt.decode(token, "secret", algorithms=["HS256"])\n'
+        )
+        rules = load_rules()
+        findings = analyze_file(file_path, "python", rules)
+        jwt_findings = [f for f in findings if f.category == "insecure_jwt"]
+        assert len(jwt_findings) >= 1, f"Expected insecure_jwt finding, got {[f.category for f in findings]}"
+
+
+def test_insecure_jwt_weak_secret():
+    with tempfile.TemporaryDirectory() as tmp:
+        file_path = str(Path(tmp, "config.py"))
+        Path(file_path).write_text(
+            'JWT_SECRET = "secret"\n'
+        )
+        rules = load_rules()
+        findings = analyze_file(file_path, "python", rules)
+        jwt_findings = [f for f in findings if f.category == "insecure_jwt"]
+        assert len(jwt_findings) >= 1, f"Expected insecure_jwt finding, got {[f.category for f in findings]}"

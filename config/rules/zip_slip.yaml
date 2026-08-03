@@ -3,31 +3,31 @@ category: zip_slip
 severity: high
 cwe: CWE-22
 languages:
-  - python
-  - javascript
-  - typescript
-  - java
-  - go
-  - csharp
-  - php
-  - kotlin
-  - swift
-  - rust
+- python
+- javascript
+- typescript
+- java
+- go
+- csharp
+- php
+- kotlin
+- swift
+- rust
 regex_patterns:
-  - (?i)\.extractall\s*\(
-  - (?i)extractall\s*\(
-  - (?i)\.extract\s*\(
-  - (?i)ZipFile\s*\(.*\.extract
-  - (?i)ZipInputStream.*getNextEntry(?!.*resolve|.*startsWith|.*\.\.)
-  - (?i)tarfile\.extractall\s*\(
-  - (?i)\.extractall\(\s*[^)]*(?!.*os\.path\.(basename|normpath|realpath))
-  - (?i)unzip\s*\(
-  - (?i)zip\.NewReader.*\.Open
-  - (?i)ArchiveFile\.ExtractToDirectory
-  - (?i)System\.IO\.Compression\.ZipFile\.ExtractToDirectory
-  - (?i)ZipArchive.*extractTo
-  - (?i)PharData/extractTo
-description_template: "Posible Zip-Slip: extracción de archivos comprimidos sin validar rutas con path traversal"
+- (?i)\.extractall\s*\(
+- (?i)extractall\s*\(
+- (?i)\.extract\s*\(
+- (?i)ZipFile\s*\(.*\.extract
+- (?i)ZipInputStream.*getNextEntry(?!.*resolve|.*startsWith|.*\.\.)
+- (?i)tarfile\.extractall\s*\(
+- '(?i)\.extractall\(\s*[^)]*(?!.*os\.path\.(basename|normpath|realpath))'
+- (?i)unzip\s*\(
+- (?i)zip\.NewReader.*\.Open
+- (?i)ArchiveFile\.ExtractToDirectory
+- (?i)System\.IO\.Compression\.ZipFile\.ExtractToDirectory
+- (?i)ZipArchive.*extractTo
+- (?i)PharData/extractTo
+description_template: 'Posible Zip-Slip: extracción de archivos comprimidos sin validar rutas con path traversal'
 remediation: |
   1. Validá cada entrada del archivo comprimido antes de extraer:
      - Rechazá nombres con "../" o "..\\".
