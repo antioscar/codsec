@@ -1,0 +1,36 @@
+id: 'AUTH-001'
+category: missing_auth
+severity: high
+cwe: 'CWE-306'
+description_template: 'Posible ausencia de autenticación/autorización en endpoint sensible'
+remediation: '1. Agregá middleware de autenticación a todos los endpoints sensibles.
+
+  2. Django: usa @login_required y @permission_required.
+
+  3. Express: implementá middleware de auth antes de los handlers.
+
+  4. Spring: usa @PreAuthorize, @Secured, o configura SecurityFilterChain.
+
+  5. Go: usa middleware de auth en gin/echo/chi.
+
+  6. Implementá autenticación a nivel de aplicación, no por endpoint.
+  '
+languages:
+- python
+- javascript
+- typescript
+- php
+- java
+- go
+- csharp
+- ruby
+- kotlin
+- swift
+- rust
+ast_node_types: []
+ast_function_names: []
+regex_patterns:
+- '(?i)app\.(get|post|put|delete|patch)\s*\(\s*[\x27"][^(\x27")]*(?:admin|dashboard|api/v\d+|webhook|callback|delete|remove)'
+- '(?i)@(Get|Post|Put|Delete|Patch)Mapping\s*\(\s*[\x27"][^(\x27")]*(?:admin|api/v\d+|delete|remove)(?!.*@PreAuthorize|@Secured)'
+- '(?i)public\s+(?:class|void|function|async)\s+\w+Controller\s*\{?(?!.*\b(auth|Authorize|Authenticate|login|filter)\b)'
+- '(?i)(router|route)\.(get|post|put|delete|patch)\s*\(\s*[\x27"][^(\x27")]*(?!\s*,\s*\w*\s*,\s*\w*\s*\))\s*\)'

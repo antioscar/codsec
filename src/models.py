@@ -86,3 +86,4 @@ class Rule:
     ast_node_types: list[str] = field(default_factory=list)
     ast_function_names: list[str] = field(default_factory=list)
     regex_patterns: list[str] = field(default_factory=list)
+    ast_context_validators: list[str] = field(default_factory=list)

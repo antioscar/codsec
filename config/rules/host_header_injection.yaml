@@ -1,0 +1,40 @@
+id: 'HHI-001'
+category: host_header_injection
+severity: high
+cwe: 'CWE-444'
+description_template: 'Posible Host Header Injection: uso del header Host sin validación'
+remediation: '1. Usá listas blancas de hosts permitidos (ALLOWED_HOSTS, trusted_hosts).
+
+  2. No uses request.host para construir URLs absolutas sin validar.
+
+  3. Validá el Host header contra una lista de dominios confiables.
+
+  4. Django: configurá ALLOWED_HOSTS explícitamente, nunca usar "*".
+
+  5. Express: validá req.hostname contra lista blanca.
+
+  6. Usá el esquema de tu aplicación (https://) en lugar de headers del request.
+  '
+languages:
+- python
+- javascript
+- typescript
+- php
+- java
+- go
+- csharp
+- ruby
+- kotlin
+- swift
+- rust
+ast_node_types: []
+ast_function_names: []
+regex_patterns:
+- '(?i)(request|req)\.(host|headers\.host|getHost|server_name)\s*(?!.*\b(ALLOWED_HOSTS|allowedHosts|trusted_hosts|checkOrigin))'
+- '(?i)server_name\s*=\s*request\.(host|get_host|headers\[[\x27\"]host[\x27\"]\])'
+- '(?i)url_for\s*\(\s*.*_external\s*=\s*True(?!.*_scheme)'
+- '(?i)request\.build_absolute_uri\s*\('
+- '(?i)url_for\s*\(\s*.*request\.(host|headers)'
+- '(?i)\.header\s*\(\s*[\x27\"]Location[\x27\"]\s*,\s*.*request\.host'
+- '(?i)ALLOWED_HOSTS\s*=\s*\[\s*[\x27\"]\*[\x27\"]\s*\]'
+- '(?i)hostname_whitelist\s*=\s*\[\s*[\x27\"]\*[\x27\"]\s*\]'

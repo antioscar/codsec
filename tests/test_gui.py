@@ -470,3 +470,155 @@ def test_compliance_tab_basic(qapp):
     tab.set_compliance(report)
     assert tab.tree.topLevelItemCount() >= 1
     assert tab.btn_export.isEnabled()
+
+
+def test_findings_table_set_findings(qapp):
+    from src.gui.findings_table import FindingsTable
+    from src.models import Finding, Severity
+    table = FindingsTable()
+    findings = [
+        Finding(id="SQLI-1", category="sql_injection", severity=Severity.CRITICAL,
+                cwe="CWE-89", language="python", file_path="app.py",
+                line_number=10, code_snippet="x", description="SQLi",
+                remediation="Use params", confidence="high"),
+        Finding(id="XSS-1", category="xss", severity=Severity.HIGH,
+                cwe="CWE-79", language="javascript", file_path="app.js",
+                line_number=5, code_snippet="y", description="XSS",
+                remediation="Use textContent", confidence="high"),
+    ]
+    table.set_findings(findings)
+    assert table.model.rowCount() == 2
+    assert table.cmb_category.count() >= 3
+
+
+def test_findings_table_filters_exist(qapp):
+    from src.gui.findings_table import FindingsTable
+    table = FindingsTable()
+    assert table.chk_critical is not None
+    assert table.chk_high is not None
+    assert table.chk_medium is not None
+    assert table.chk_low is not None
+    assert table.txt_search is not None
+    assert hasattr(table, '_toggle_filters')
+
+
+def test_findings_table_context_menu_actions(qapp):
+    from src.gui.findings_table import FindingsTable
+    from src.models import Finding, Severity
+    table = FindingsTable()
+    findings = [Finding(id="T-1", category="sql_injection", severity=Severity.CRITICAL,
+                        cwe="CWE-89", language="python", file_path="app.py",
+                        line_number=1, code_snippet="x", description="d",
+                        remediation="r", confidence="high")]
+    table.set_findings(findings)
+    assert hasattr(table, '_show_context_menu')
+    assert callable(table._show_context_menu)
+
+
+def test_findings_table_remediation_copy(qapp):
+    from src.gui.findings_table import FindingsTable
+    from src.models import Finding, Severity
+    table = FindingsTable()
+    finding = Finding(id="T-1", category="sql_injection", severity=Severity.CRITICAL,
+                      cwe="CWE-89", language="python", file_path="app.py",
+                      line_number=1, code_snippet="x", description="d",
+                      remediation="Use parameters", confidence="high")
+    table.set_findings([finding])
+    assert hasattr(table, '_copy_remediation')
+    assert callable(table._copy_remediation)
+
+
+def test_findings_table_filter_toggle(qapp):
+    from src.gui.findings_table import FindingsTable
+    table = FindingsTable()
+    assert hasattr(table, '_filter_widgets')
+    table._toggle_filters()
+
+
+def test_dashboard_set_report(qapp):
+    from src.gui.dashboard import Dashboard
+    from src.models import ScanReport, Finding, Severity
+    dash = Dashboard()
+    findings = [
+        Finding(id="C-1", category="sql_injection", severity=Severity.CRITICAL,
+                cwe="CWE-89", language="python", file_path="a.py",
+                line_number=1, code_snippet="x", description="SQLi",
+                remediation="fix", confidence="high"),
+        Finding(id="H-1", category="xss", severity=Severity.HIGH,
+                cwe="CWE-79", language="js", file_path="b.js",
+                line_number=2, code_snippet="y", description="XSS",
+                remediation="fix", confidence="high"),
+    ]
+    report = ScanReport(target_path="/tmp", total_files_scanned=5,
+                        total_findings=2, findings=findings,
+                        scan_duration_seconds=0.5)
+    dash.set_report(report)
+    assert dash.placeholder.isHidden()
+    assert not dash.chart_view.isHidden()
+    assert not dash.donut_view.isHidden()
+    assert dash.cards_layout.count() > 0
+
+
+def test_dashboard_kpi_card(qapp):
+    from src.gui.dashboard import KpiCard
+    card = KpiCard("TEST", "42", "#FF0000", "")
+    assert card.value_lbl is not None
+    card.animate_value(100)
+    card.set_value("50")
+    assert card.value_lbl.text() == "50"
+
+
+def test_dashboard_animated_label(qapp):
+    from src.gui.dashboard import AnimatedLabel
+    label = AnimatedLabel("0")
+    label.animate_to(50)
+    assert label._target == 50
+
+
+def test_dashboard_placeholder_visible(qapp):
+    from src.gui.dashboard import Dashboard
+    dash = Dashboard()
+    assert not dash.placeholder.isHidden()
+    assert dash.chart_view.isHidden()
+
+
+def test_mainwindow_quick_export_exists(qapp):
+    from src.gui.main_window import MainWindow
+    w = MainWindow()
+    assert hasattr(w, 'quick_export_action')
+    assert w.quick_export_action is not None
+    assert not w.quick_export_action.isEnabled()
+
+
+def test_mainwindow_file_tree_dock(qapp):
+    from src.gui.main_window import MainWindow
+    w = MainWindow()
+    assert hasattr(w, 'file_tree_dock')
+    assert not w.file_tree_dock.isVisible()
+
+
+def test_toast_creation(qapp):
+    from src.gui.toast import Toast, show_toast
+    toast = Toast("Test message", "info", duration=1000)
+    assert toast is not None
+    assert toast._duration == 1000
+
+
+def test_toast_types(qapp):
+    from src.gui.toast import Toast
+    for t in ("info", "success", "warning", "error"):
+        toast = Toast(f"Test {t}", t, duration=100)
+        assert toast.ICONS.get(t) is not None
+        assert toast.COLORS.get(t) is not None
+
+
+def test_toast_show_at_callback(qapp):
+    from src.gui.toast import Toast
+    from PySide6.QtWidgets import QMainWindow
+    w = QMainWindow()
+    w.resize(400, 300)
+    w.show()
+    toast = Toast("Test", "success", duration=100)
+    toast.show_at(w)
+    assert toast.isVisible()
+    w.hide()

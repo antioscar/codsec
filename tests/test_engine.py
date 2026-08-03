@@ -207,7 +207,9 @@ def test_load_all_rules_count():
                 "ssti", "xxe", "ldap_injection", "prototype_pollution", "log_injection",
                 "zip_slip", "weak_hash", "cors_misconfiguration", "cookie_security", "insecure_jwt",
                 "nosql_injection", "insecure_random", "idor_access_control",
-                "unsafe_deserialization_advanced", "http_parameter_pollution"}
+                "unsafe_deserialization_advanced", "http_parameter_pollution",
+                "graphql_injection", "missing_auth", "unsafe_redirect",
+                "host_header_injection", "insecure_file_upload"}
     assert categories == expected
 
 

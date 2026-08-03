@@ -19,6 +19,8 @@ ALL_RULE_CATEGORIES = [
     "cors_misconfiguration", "cookie_security", "insecure_jwt",
     "nosql_injection", "insecure_random", "idor_access_control",
     "unsafe_deserialization_advanced", "http_parameter_pollution",
+    "graphql_injection", "missing_auth", "unsafe_redirect",
+    "host_header_injection", "insecure_file_upload",
 ]
 
 

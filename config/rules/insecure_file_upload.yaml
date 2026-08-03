@@ -1,0 +1,39 @@
+id: 'UPLOAD-001'
+category: insecure_file_upload
+severity: high
+cwe: 'CWE-434'
+description_template: 'Posible upload de archivos inseguro: falta de validación de tipo, tamaño o extensión'
+remediation: '1. Validá el tipo MIME y la extensión del archivo antes de guardarlo.
+
+  2. Almacená los archivos fuera del directorio web (fuera de /public o /static).
+
+  3. Limitá el tamaño máximo de archivo aceptado.
+
+  4. Usá nombres únicos generados (UUIDs, hashes) en lugar del nombre original.
+
+  5. Escaneá los archivos en busca de malware (ClamAV) para uploads críticos.
+
+  6. Implementá allowlists de extensiones (nunca usar blocklists).
+  '
+languages:
+- python
+- javascript
+- typescript
+- php
+- java
+- go
+- csharp
+- ruby
+- kotlin
+- swift
+- rust
+ast_node_types: []
+ast_function_names: []
+regex_patterns:
+- '(?i)request\.files\[[\x27\"]\w+[\x27\"]\]\.(save|filename)\s*\([^)]*(?!.*\.(jpg|png|pdf|docx))'
+- '(?i)\.upload\s*\(\s*\{[^}]*(?<!fileFilter|fileSize|limits|whitelist)(?!.*destination)'
+- '(?i)move_uploaded_file\s*\(\s*.*\$_(FILES|GET|POST)'
+- '(?i)\.transferTo\s*\(\s*new\s+File\s*\([^)]*(?!.*\.\./)'
+- '(?i)multer\s*\(\s*\{[^}]*(?<!limits|fileFilter|storage)'
+- '(?i)saveUploadedFile\s*\([^)]*(?!.*\.\.)'
+- '(?i)(FormFile|ParseMultipartForm|multipart\.FileHeader|FileHeader)\s*(?!.*\/\w+\.\w{2,4})'

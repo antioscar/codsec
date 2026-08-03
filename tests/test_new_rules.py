@@ -303,3 +303,64 @@ def test_http_parameter_pollution_javascript():
         findings = analyze_file(file_path, "javascript", rules)
         hpp = [f for f in findings if f.category == "http_parameter_pollution"]
         assert len(hpp) >= 1, f"Expected http_parameter_pollution finding, got {[f.category for f in findings]}"
+
+
+def test_graphql_injection_javascript():
+    with tempfile.TemporaryDirectory() as tmp:
+        file_path = str(Path(tmp, "app.js"))
+        Path(file_path).write_text(
+            'const { ApolloServer } = require("apollo-server");\n'
+            'const server = new ApolloServer({\n'
+            '    typeDefs,\n'
+            '    resolvers,\n'
+            '    introspection: true,\n'
+            '});\n'
+        )
+        rules = load_rules()
+        findings = analyze_file(file_path, "javascript", rules)
+        gql = [f for f in findings if f.category == "graphql_injection"]
+        assert len(gql) >= 1, f"Expected graphql_injection finding, got {[f.category for f in findings]}"
+
+
+def test_missing_auth_python():
+    with tempfile.TemporaryDirectory() as tmp:
+        file_path = str(Path(tmp, "app.py"))
+        Path(file_path).write_text(
+            'from flask import Flask\n'
+            'app = Flask(__name__)\n'
+            'app.get("/admin/delete/<id>")\n'
+            'def admin_delete(id):\n'
+            '    return f"Deleted {id}"\n'
+        )
+        rules = load_rules()
+        findings = analyze_file(file_path, "python", rules)
+        auth = [f for f in findings if f.category == "missing_auth"]
+        assert len(auth) >= 1, f"Expected missing_auth finding, got {[f.category for f in findings]}"
+
+
+def test_host_header_injection_python():
+    with tempfile.TemporaryDirectory() as tmp:
+        file_path = str(Path(tmp, "settings.py"))
+        Path(file_path).write_text(
+            'ALLOWED_HOSTS = ["*"]\n'
+        )
+        rules = load_rules()
+        findings = analyze_file(file_path, "python", rules)
+        hhi = [f for f in findings if f.category == "host_header_injection"]
+        assert len(hhi) >= 1, f"Expected host_header_injection finding, got {[f.category for f in findings]}"
+
+
+def test_insecure_file_upload_python():
+    with tempfile.TemporaryDirectory() as tmp:
+        file_path = str(Path(tmp, "app.py"))
+        Path(file_path).write_text(
+            'from flask import request\n'
+            '@app.route("/upload", methods=["POST"])\n'
+            'def upload():\n'
+            '    request.files["file"].save("uploads/" + request.files["file"].filename)\n'
+            '    return "ok"\n'
+        )
+        rules = load_rules()
+        findings = analyze_file(file_path, "python", rules)
+        upload = [f for f in findings if f.category == "insecure_file_upload"]
+        assert len(upload) >= 1, f"Expected insecure_file_upload finding, got {[f.category for f in findings]}"

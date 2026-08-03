@@ -1,0 +1,35 @@
+id: 'REDIR-ADV-001'
+category: unsafe_redirect
+severity: high
+cwe: 'CWE-601'
+description_template: 'Posible redirección no segura usando parámetros de URL sin validación de dominio'
+remediation: '1. Implementá whitelist de dominios permitidos para redirecciones.
+
+  2. Usá URLs relativas cuando sea posible.
+
+  3. Validá que la URL de destino comience con "/" para rutas locales.
+
+  4. Decodificá y validá URLs usando urlparse/URL() antes de redirigir.
+
+  5. Para OAuth, verificá que redirect_uri coincida con el registrado en la app.
+  '
+languages:
+- python
+- javascript
+- typescript
+- php
+- java
+- go
+- csharp
+- ruby
+- kotlin
+- swift
+- rust
+ast_node_types: []
+ast_function_names: []
+regex_patterns:
+- '(?i)(next|redirect_uri|return_url|continue|callback_url)\s*=\s*request\.(GET|POST|args|query|params|body)\.get'
+- '(?i)\.redirect\s*\(\s*.*(?:\+|\breq\.|\brequest\.|\bparams\[)(?!.*urlparse|URL\(|^https?:)\w'
+- '(?i)redirect_uri\s*=\s*req\.(query|params|body)\.\w+'
+- '(?i)window\.location\.(href|replace)\s*=\s*.*\b(location\.search|\.hash|req|input)'
+- '(?i)(Navigation|Router)\.navigate\s*\(\s*.*\b(input|param|req)'

@@ -15,43 +15,51 @@ def _is_false_positive_secret(matched_text: str) -> bool:
     return False
 
 
-def _find_containing_string_node(node: Node | None, byte_pos: int) -> Node | None:
-    if node is None:
+def _find_node_at_position(root_node: Node, byte_pos: int) -> Node | None:
+    if root_node.start_byte > byte_pos or root_node.end_byte < byte_pos:
         return None
-    node_type = node.type
-    if ("string" in node_type or node_type in (
-        "string_literal", "raw_string_literal", "interpreted_string_literal",
-        "encapsed_string", "heredoc", "template_string", "template_literal",
-    )) and node.start_byte <= byte_pos <= node.end_byte:
-        return node
-    for child in node.children:
-        result = _find_containing_string_node(child, byte_pos)
-        if result:
+    for child in root_node.children:
+        result = _find_node_at_position(child, byte_pos)
+        if result is not None:
             return result
-    return None
+    return root_node
 
 
-def _is_in_string_or_comment(node: Node | None, start_byte: int, end_byte: int) -> bool:
-    """Check if a byte range falls inside a string or comment AST node."""
+def _is_match_in_code(root_node: Node, start_byte: int, end_byte: int, source_text: str) -> bool:
+    node = _find_node_at_position(root_node, start_byte)
     if node is None:
-        return False
-    node_type = node.type
-    if node_type in ("comment", "block_comment", "line_comment") or "comment" in node_type:
-        if node.start_byte <= start_byte and node.end_byte >= end_byte:
-            return True
-    if "string" in node_type or node_type in (
-        "string_literal", "string_content", "template_string",
-        "template_literal", "raw_string_literal", "interpreted_string_literal",
-        "encapsed_string", "heredoc", "heredoc_body", "nowdoc_body",
-        "charliteral", "character_literal", "string_fragment",
-    ):
-        if node.start_byte <= start_byte and node.end_byte >= end_byte:
-            return True
+        return True
 
-    for child in node.children:
-        if _is_in_string_or_comment(child, start_byte, end_byte):
-            return True
-    return False
+    current = node
+    while current is not None:
+        node_type = (current.type or "").lower()
+
+        if "comment" in node_type:
+            return False
+
+        if "string" in node_type and current.end_byte - current.start_byte > 100:
+            return False
+
+        if "string" in node_type:
+            for target in ("write_text", "write", "send"):
+                parent = current.parent
+                while parent is not None:
+                    ptype = (parent.type or "").lower()
+                    if "call" in ptype:
+                        source_bytes = source_text.encode("utf-8", errors="replace")
+                        func_name = None
+                        for child in parent.children:
+                            if child.type in ("identifier", "name"):
+                                func_name = source_bytes[child.start_byte:child.end_byte].decode("utf-8", errors="replace")
+                                break
+                        if func_name == target:
+                            return False
+                        break
+                    parent = parent.parent
+
+        current = current.parent
+
+    return True
 
 
 def apply_regex_rule(
@@ -84,13 +92,9 @@ def apply_regex_rule(
             line_idx = line_number - 1
             line_text = lines[line_idx] if line_idx < len(lines) else ""
 
-            if parsed_root is not None and rule.category == "hardcoded_secrets":
-                match_start_byte = match.start()
-                match_end_byte = match.end()
-                if _is_in_string_or_comment(parsed_root, match_start_byte, match_end_byte):
-                    node = _find_containing_string_node(parsed_root, match_start_byte)
-                    if node and node.end_byte - node.start_byte > 100:
-                        continue
+            if parsed_root is not None:
+                if not _is_match_in_code(parsed_root, match.start(), match.end(), source_text):
+                    continue
 
             if rule.category in ("hardcoded_secrets", "info_disclosure"):
                 if "/test/" in file_path or os.path.basename(file_path).startswith("test_"):

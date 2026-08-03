@@ -1,0 +1,41 @@
+id: 'GRAPHQL-001'
+category: graphql_injection
+severity: high
+cwe: 'CWE-943'
+description_template: 'Posible vulnerabilidad en API GraphQL: falta de validación de queries, depth limit, o batching sin protección'
+remediation: '1. Configurá límite de profundidad (maxDepth/depthLimit) para prevenir ataques DoS.
+
+  2. Deshabilitá introspection en producción: introspection: false.
+
+  3. Implementá query complexity analysis (graphql-cost-analysis, graphql-query-complexity).
+
+  4. Configurá rate limiting y maxBatchSize para batching.
+
+  5. Validá y sanitizá variables de query antes de pasarlas a resolvers.
+
+  6. Usá allow lists para queries en producción.
+  '
+languages:
+- python
+- javascript
+- typescript
+- php
+- java
+- go
+- csharp
+- ruby
+- kotlin
+- swift
+- rust
+ast_node_types: []
+ast_function_names: []
+regex_patterns:
+- '(?i)(graphql|gql)\s*(?:\x60|\x27|")\s*(?:query|mutation|subscription)\s*\{[^}]*\$\{'
+- '(?i)(buildSchema|makeExecutableSchema|GraphQLSchema)\s*\(\s*[^)]*(?<!validationRules)'
+- '(?i)(graphqlHTTP|graphqlExpress|apolloServer)\s*\(\s*\{[^}]*(?<!validationRules|maxDepth|complexity)'
+- '(?i)(execute|graphql)\s*\(\s*\{[^}]*schema[^}]*contextValue[^}]*variableValues\s*:\s*.*\b(request|req|input|params)'
+- '(?i)(introspection|graphiql)\s*:\s*true(?!.*\b(production|prod)\b)'
+- '(?i)\b(maxDepth|depthLimit|complexity)\s*:\s*\d{3,}'
+- '(?i)batch\s*:\s*true(?!.*maxBatchSize)'
+- '(?i)\.use\s*\(\s*\/graphql'
+- '(?i)@GraphQLApi|@GraphQLMutation|@GraphQLQuery(?!.*auth)'
