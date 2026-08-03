@@ -1,0 +1,52 @@
+services:
+  scan:
+    build: .
+    container_name: codsec-scanner
+    volumes:
+      - .:/target:ro
+      - ./reports:/app/reports
+      - ./cache:/app/cache
+    command: >
+      -p /target
+      --no-llm
+      -o reports/informe_seguridad.pdf
+      -j reports/informe_seguridad.json
+      --fail-on high
+
+  scan-online:
+    build: .
+    container_name: codsec-scanner-online
+    volumes:
+      - .:/target:ro
+      - ./reports:/app/reports
+      - ./cache:/app/cache
+    command: >
+      -p /target
+      --no-llm
+      --online-cve
+      -o reports/informe_seguridad.pdf
+      -j reports/informe_seguridad.json
+      --fail-on high
+    profiles:
+      - online
+
+  scan-full:
+    build: .
+    container_name: codsec-scanner-full
+    volumes:
+      - .:/target:ro
+      - ./reports:/app/reports
+      - ./cache:/app/cache
+    command: >
+      -p /target
+      --no-llm
+      --online-cve
+      -o reports/informe_seguridad.pdf
+      -j reports/informe_seguridad.json
+      --html reports/informe_seguridad.html
+      --sarif reports/informe_seguridad.sarif
+      --gitlab reports/gl-code-quality.json
+      --compliance-json reports/compliance.json
+      --fail-on high
+    profiles:
+      - full

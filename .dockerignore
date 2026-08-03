@@ -1,0 +1,17 @@
+.git
+.gitignore
+.github
+.venv
+.pytest_cache
+__pycache__
+*.pyc
+dist
+build
+*.spec
+*.ps1
+node_modules
+.idea
+.vscode
+*.egg-info
+.coverage
+.python-version
