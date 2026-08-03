@@ -16,6 +16,7 @@ def scan_project(
     min_severity: Severity = Severity.LOW,
     exclude_dirs: Optional[set[str]] = None,
     on_progress: Optional[Callable[[int, int, str], None]] = None,
+    on_phase: Optional[Callable[[str], None]] = None,
     use_llm: bool = False,
     llm_client=None,
     baseline_path: Optional[str] = None,
@@ -42,6 +43,9 @@ def scan_project(
         language = language_from_extension(file_path)
         if language is not None:
             analysable.append((idx, file_path, language))
+
+    if on_phase:
+        on_phase("rules")
 
     all_findings: list[Finding] = []
     progress_lock = threading.Lock()
@@ -79,6 +83,9 @@ def scan_project(
         f.id = f"{f.category[:4].upper()}-{counter:04d}"
 
     dep_findings = scan_dependencies(target_path)
+
+    if on_phase:
+        on_phase("deps")
 
     if online_cve:
         try:
@@ -125,11 +132,15 @@ def scan_project(
         all_findings.append(df)
 
     if use_llm:
+        if on_phase:
+            on_phase("llm")
         all_findings = _run_llm_phase(
             target_path, files, all_findings, counter, llm_client, on_progress
         )
 
     if baseline_path:
+        if on_phase:
+            on_phase("baseline")
         from src.baseline import load_baseline, mark_findings, filter_new
         baseline = load_baseline(baseline_path)
         mark_findings(all_findings, baseline)

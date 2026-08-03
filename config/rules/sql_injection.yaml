@@ -11,7 +11,7 @@ remediation: |
   5. Java: usa PreparedStatement en JDBC.
   6. Si debes construir queries dinámicas, sanitiza y escapa todas las entradas.
 
-languages: [python, javascript, typescript, php, java, go, csharp, ruby]
+languages: [python, javascript, typescript, php, java, go, csharp, ruby, kotlin, swift, rust]
 
 ast_node_types: []
 

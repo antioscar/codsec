@@ -10,6 +10,9 @@ import tree_sitter_go
 import tree_sitter_c_sharp
 import tree_sitter_ruby
 import tree_sitter_typescript
+import tree_sitter_kotlin
+import tree_sitter_swift
+import tree_sitter_rust
 from tree_sitter import Language, Parser, Node, Point
 
 
@@ -41,6 +44,12 @@ def _get_language(lang: str) -> Optional[Language]:
         return Language(tree_sitter_c_sharp.language())
     if lang == "ruby":
         return Language(tree_sitter_ruby.language())
+    if lang == "kotlin":
+        return Language(tree_sitter_kotlin.language())
+    if lang == "swift":
+        return Language(tree_sitter_swift.language())
+    if lang == "rust":
+        return Language(tree_sitter_rust.language())
     return None
 
 

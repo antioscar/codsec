@@ -145,3 +145,84 @@ def test_verify_multiple():
 
         result = apply_verdicts(findings, verdicts)
         assert len(result) == 2
+
+
+def test_read_context_manifest_file():
+    from src.llm.verifier import _read_context
+
+    result = _read_context("/tmp/package.json", 0)
+    assert result == "(archivo de manifiesto de dependencias — no hay código fuente)"
+
+
+def test_read_context_file_not_found():
+    from src.llm.verifier import _read_context
+
+    result = _read_context("/tmp/nonexistent_file_xyz_123.py", 5)
+    assert result == "(no se pudo leer el archivo)"
+
+
+def test_verify_findings_sorts_by_severity():
+    from src.llm.verifier import verify_findings
+
+    client = FakeLLMClient()
+    with tempfile.TemporaryDirectory() as tmp:
+        findings = []
+        for i in range(4):
+            py_file = os.path.join(tmp, f"high{i}.py")
+            with open(py_file, "w") as f:
+                f.write("x = input()\n")
+            fnd = _make_finding(f"T-HIGH-{i:04d}", py_file, 1)
+            fnd.severity = Severity.HIGH
+            findings.append(fnd)
+        for i in range(3):
+            py_file = os.path.join(tmp, f"crit{i}.py")
+            with open(py_file, "w") as f:
+                f.write("x = input()\n")
+            fnd = _make_finding(f"T-CRIT-{i:04d}", py_file, 1)
+            fnd.severity = Severity.CRITICAL
+            findings.append(fnd)
+        for i in range(4):
+            py_file = os.path.join(tmp, f"med{i}.py")
+            with open(py_file, "w") as f:
+                f.write("x = input()\n")
+            fnd = _make_finding(f"T-MED-{i:04d}", py_file, 1)
+            fnd.severity = Severity.MEDIUM
+            findings.append(fnd)
+        for i in range(4):
+            py_file = os.path.join(tmp, f"low{i}.py")
+            with open(py_file, "w") as f:
+                f.write("x = input()\n")
+            fnd = _make_finding(f"T-LOW-{i:04d}", py_file, 1)
+            fnd.severity = Severity.LOW
+            findings.append(fnd)
+
+        total = len(findings)
+        assert total == 15
+
+        verdicts = verify_findings(findings, client, max_findings=5)
+        assert len(verdicts) == 5
+        for i in range(3):
+            assert f"T-CRIT-{i:04d}" in verdicts
+        assert "T-HIGH-0000" in verdicts
+        assert "T-HIGH-0001" in verdicts
+
+
+def test_verify_findings_chat_error():
+    from src.llm.verifier import verify_findings
+
+    class ErrorLLMClient:
+        def chat(self, messages, temperature=None):
+            raise Exception("Chat error")
+
+        def close(self):
+            pass
+
+    client = ErrorLLMClient()
+    with tempfile.TemporaryDirectory() as tmp:
+        py_file = os.path.join(tmp, "test.py")
+        with open(py_file, "w") as f:
+            f.write("x = input()\n")
+        finding = _make_finding("T-ERR-0001", py_file, 1)
+
+        verdicts = verify_findings([finding], client)
+        assert verdicts == {"T-ERR-0001": "error"}

@@ -9,6 +9,9 @@ languages:
   - php
   - java
   - csharp
+  - kotlin
+  - swift
+  - rust
 ast_function_names:
   - parse
   - fromstring

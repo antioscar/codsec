@@ -13,7 +13,7 @@ remediation: |
   7. No expongas `print()` o `console.log()` con datos sensibles (passwords, tokens, datos de usuario).
   8. Deshabilitá el modo debug en todos los entornos de producción.
 
-languages: [python, javascript, typescript, php, java, go, csharp, ruby]
+languages: [python, javascript, typescript, php, java, go, csharp, ruby, kotlin, swift, rust]
 
 ast_node_types: []
 

@@ -11,7 +11,7 @@ remediation: |
   5. Python: usa una lista de hosts permitidos con `urllib.parse.urlparse()`.
   6. JS: valida la URL antes de pasarla a `axios`, `fetch`, `http.request`.
 
-languages: [python, javascript, typescript, php, java, go, csharp, ruby]
+languages: [python, javascript, typescript, php, java, go, csharp, ruby, kotlin, swift, rust]
 
 ast_node_types: []
 

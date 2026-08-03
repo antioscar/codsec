@@ -12,7 +12,7 @@ remediation: |
   6. Spring: habilita CSRF protection (activado por defecto) o usa `CsrfToken` en formularios.
   7. Para APIs, usa tokens en headers (ej. `X-CSRF-Token`) en vez de cookies.
 
-languages: [python, javascript, typescript, php, java, go, csharp, ruby]
+languages: [python, javascript, typescript, php, java, go, csharp, ruby, kotlin, swift, rust]
 
 ast_node_types: []
 

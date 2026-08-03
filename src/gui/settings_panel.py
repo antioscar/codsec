@@ -2,12 +2,13 @@ from __future__ import annotations
 from PySide6.QtWidgets import (
     QWidget, QVBoxLayout, QHBoxLayout, QGroupBox, QCheckBox,
     QComboBox, QPushButton, QLabel, QListWidget, QListWidgetItem,
-    QLineEdit, QMessageBox, QFileDialog,
+    QLineEdit, QMessageBox, QFileDialog, QTabWidget, QGridLayout,
 )
 from PySide6.QtCore import Qt
 
 from src.config import load_config, SETTINGS_PATH
 from src.llm.provider import LLM_CONFIG_PATH, load_llm_config
+from src.gui.toast import show_toast
 
 ALL_RULE_CATEGORIES = [
     "sql_injection", "xss", "command_injection", "hardcoded_secrets",
@@ -23,33 +24,11 @@ class SettingsPanel(QWidget):
         super().__init__(parent)
         layout = QVBoxLayout(self)
 
-        lang_group = QGroupBox("Lenguajes activos")
-        lang_layout = QHBoxLayout(lang_group)
-        self.chk_python = QCheckBox("Python")
-        self.chk_python.setChecked(True)
-        self.chk_javascript = QCheckBox("JavaScript")
-        self.chk_javascript.setChecked(True)
-        self.chk_typescript = QCheckBox("TypeScript")
-        self.chk_typescript.setChecked(True)
-        self.chk_php = QCheckBox("PHP")
-        self.chk_php.setChecked(True)
-        self.chk_java = QCheckBox("Java")
-        self.chk_java.setChecked(True)
-        self.chk_go = QCheckBox("Go")
-        self.chk_go.setChecked(True)
-        self.chk_csharp = QCheckBox("C#")
-        self.chk_csharp.setChecked(True)
-        self.chk_ruby = QCheckBox("Ruby")
-        self.chk_ruby.setChecked(True)
-        lang_layout.addWidget(self.chk_python)
-        lang_layout.addWidget(self.chk_javascript)
-        lang_layout.addWidget(self.chk_typescript)
-        lang_layout.addWidget(self.chk_php)
-        lang_layout.addWidget(self.chk_java)
-        lang_layout.addWidget(self.chk_go)
-        lang_layout.addWidget(self.chk_csharp)
-        lang_layout.addWidget(self.chk_ruby)
-        layout.addWidget(lang_group)
+        tabs = QTabWidget()
+
+        # ── Tab 1: General ──
+        general_tab = QWidget()
+        general_layout = QVBoxLayout(general_tab)
 
         sev_group = QGroupBox("Severidad mínima")
         sev_layout = QHBoxLayout(sev_group)
@@ -58,7 +37,16 @@ class SettingsPanel(QWidget):
         self.cmb_severity.addItems(["low", "medium", "high", "critical"])
         self.cmb_severity.setCurrentText("low")
         sev_layout.addWidget(self.cmb_severity)
-        layout.addWidget(sev_group)
+        general_layout.addWidget(sev_group)
+
+        theme_group = QGroupBox("Tema")
+        theme_layout = QHBoxLayout(theme_group)
+        theme_layout.addWidget(QLabel("Tema de la interfaz:"))
+        self.cmb_theme = QComboBox()
+        self.cmb_theme.addItems(["dark", "light"])
+        self.cmb_theme.setCurrentText("dark")
+        theme_layout.addWidget(self.cmb_theme)
+        general_layout.addWidget(theme_group)
 
         exclude_group = QGroupBox("Directorios excluidos")
         exclude_layout = QVBoxLayout(exclude_group)
@@ -77,17 +65,59 @@ class SettingsPanel(QWidget):
         btn_remove.clicked.connect(self._remove_exclude)
         add_layout.addWidget(btn_remove)
         exclude_layout.addLayout(add_layout)
-        layout.addWidget(exclude_group)
+        general_layout.addWidget(exclude_group)
 
-        theme_group = QGroupBox("Tema")
-        theme_layout = QHBoxLayout(theme_group)
-        theme_layout.addWidget(QLabel("Tema de la interfaz:"))
-        self.cmb_theme = QComboBox()
-        self.cmb_theme.addItems(["dark", "light"])
-        self.cmb_theme.setCurrentText("dark")
-        theme_layout.addWidget(self.cmb_theme)
-        layout.addWidget(theme_group)
+        btn_save = QPushButton("Guardar configuración")
+        btn_save.clicked.connect(self.save_settings)
+        general_layout.addWidget(btn_save)
 
+        tabs.addTab(general_tab, self.tr("General"))
+
+        # ── Tab 2: Lenguajes ──
+        lang_tab = QWidget()
+        lang_tab_layout = QVBoxLayout(lang_tab)
+        lang_group = QGroupBox("Lenguajes activos")
+        lang_inner = QGridLayout(lang_group)
+        self.chk_python = QCheckBox("Python")
+        self.chk_python.setChecked(True)
+        self.chk_javascript = QCheckBox("JavaScript")
+        self.chk_javascript.setChecked(True)
+        self.chk_typescript = QCheckBox("TypeScript")
+        self.chk_typescript.setChecked(True)
+        self.chk_php = QCheckBox("PHP")
+        self.chk_php.setChecked(True)
+        self.chk_java = QCheckBox("Java")
+        self.chk_java.setChecked(True)
+        self.chk_go = QCheckBox("Go")
+        self.chk_go.setChecked(True)
+        self.chk_csharp = QCheckBox("C#")
+        self.chk_csharp.setChecked(True)
+        self.chk_ruby = QCheckBox("Ruby")
+        self.chk_ruby.setChecked(True)
+        self.chk_kotlin = QCheckBox("Kotlin")
+        self.chk_kotlin.setChecked(False)
+        self.chk_swift = QCheckBox("Swift")
+        self.chk_swift.setChecked(False)
+        self.chk_rust = QCheckBox("Rust")
+        self.chk_rust.setChecked(False)
+        lang_inner.addWidget(self.chk_python, 0, 0)
+        lang_inner.addWidget(self.chk_javascript, 0, 1)
+        lang_inner.addWidget(self.chk_typescript, 0, 2)
+        lang_inner.addWidget(self.chk_php, 1, 0)
+        lang_inner.addWidget(self.chk_java, 1, 1)
+        lang_inner.addWidget(self.chk_go, 1, 2)
+        lang_inner.addWidget(self.chk_csharp, 2, 0)
+        lang_inner.addWidget(self.chk_ruby, 2, 1)
+        lang_inner.addWidget(self.chk_kotlin, 2, 2)
+        lang_inner.addWidget(self.chk_swift, 3, 0)
+        lang_inner.addWidget(self.chk_rust, 3, 1)
+        lang_tab_layout.addWidget(lang_group)
+        lang_tab_layout.addStretch()
+        tabs.addTab(lang_tab, self.tr("Lenguajes"))
+
+        # ── Tab 3: IA / LLM ──
+        llm_tab = QWidget()
+        llm_tab_layout = QVBoxLayout(llm_tab)
         llm_group = QGroupBox("IA / LLM")
         llm_layout = QVBoxLayout(llm_group)
 
@@ -138,7 +168,13 @@ class SettingsPanel(QWidget):
         llm_features.addStretch()
         llm_layout.addLayout(llm_features)
 
-        layout.addWidget(llm_group)
+        llm_tab_layout.addWidget(llm_group)
+        llm_tab_layout.addStretch()
+        tabs.addTab(llm_tab, self.tr("IA / LLM"))
+
+        # ── Tab 4: Avanzado ──
+        avanzado_tab = QWidget()
+        avanzado_layout = QVBoxLayout(avanzado_tab)
 
         baseline_group = QGroupBox("Baseline (delta de hallazgos)")
         baseline_layout = QVBoxLayout(baseline_group)
@@ -161,7 +197,7 @@ class SettingsPanel(QWidget):
         self.chk_online_cve.setToolTip("Consulta la API de OSV para buscar CVEs actualizados. Requiere conexión a internet.")
         baseline_layout.addWidget(self.chk_online_cve)
 
-        layout.addWidget(baseline_group)
+        avanzado_layout.addWidget(baseline_group)
 
         rules_group = QGroupBox("Reglas personalizadas")
         rules_layout = QHBoxLayout(rules_group)
@@ -172,13 +208,12 @@ class SettingsPanel(QWidget):
         btn_rules_browse = QPushButton("Buscar...")
         btn_rules_browse.clicked.connect(self._browse_rules_dir)
         rules_layout.addWidget(btn_rules_browse)
-        layout.addWidget(rules_group)
+        avanzado_layout.addWidget(rules_group)
 
-        btn_save = QPushButton("Guardar configuración")
-        btn_save.clicked.connect(self.save_settings)
-        layout.addWidget(btn_save)
+        avanzado_layout.addStretch()
+        tabs.addTab(avanzado_tab, self.tr("Avanzado"))
 
-        layout.addStretch()
+        layout.addWidget(tabs)
         self.load_current()
 
     def load_current(self):
@@ -300,7 +335,7 @@ class SettingsPanel(QWidget):
         with open(str(LLM_CONFIG_PATH), "w", encoding="utf-8") as f:
             yaml.dump(llm_data, f, default_flow_style=False, allow_unicode=True, sort_keys=False)
 
-        QMessageBox.information(self, "Guardado", "Configuración guardada correctamente.")
+        show_toast(self, "Configuración guardada correctamente.", "success")
 
     def _add_exclude(self):
         text = self.txt_add_exclude.text().strip()

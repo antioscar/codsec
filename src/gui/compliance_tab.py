@@ -1,7 +1,7 @@
 from __future__ import annotations
 from PySide6.QtWidgets import (
     QWidget, QVBoxLayout, QLabel, QTreeWidget, QTreeWidgetItem,
-    QHBoxLayout, QProgressBar,
+    QHBoxLayout, QProgressBar, QPushButton, QFileDialog, QMessageBox,
 )
 from PySide6.QtCore import Qt
 
@@ -16,11 +16,16 @@ class ComplianceTab(QWidget):
         super().__init__(parent)
         layout = QVBoxLayout(self)
 
-        header = QLabel("Cumplimiento de Normas de Seguridad")
+        header = QLabel(self.tr("Cumplimiento de Normas de Seguridad"))
         header.setStyleSheet("font-size:16px; font-weight:bold; padding:8px 0;")
         layout.addWidget(header)
 
-        self.empty_label = QLabel("Ejecute un análisis para ver el cumplimiento")
+        self.btn_export = QPushButton(self.tr("📄 Exportar cumplimiento (JSON)"))
+        self.btn_export.clicked.connect(self._export_compliance)
+        self.btn_export.setEnabled(False)
+        layout.addWidget(self.btn_export)
+
+        self.empty_label = QLabel(self.tr("Ejecute un análisis para ver el cumplimiento"))
         self.empty_label.setStyleSheet("color: #6a6a8a; font-size: 16px;")
         self.empty_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
         layout.addWidget(self.empty_label)
@@ -29,7 +34,10 @@ class ComplianceTab(QWidget):
         layout.addLayout(self.score_layout)
 
         self.tree = QTreeWidget()
-        self.tree.setHeaderLabels(["Control", "Título", "Estado", "Hallazgos", "Severidad"])
+        self.tree.setHeaderLabels([
+            self.tr("Control"), self.tr("Título"), self.tr("Estado"),
+            self.tr("Hallazgos"), self.tr("Severidad"),
+        ])
         self.tree.setColumnWidth(0, 120)
         self.tree.setColumnWidth(1, 280)
         self.tree.setColumnWidth(2, 100)
@@ -39,13 +47,16 @@ class ComplianceTab(QWidget):
         layout.addWidget(self.tree)
 
         self._theme = "dark"
+        self._report: ScanReport | None = None
 
     def set_theme(self, theme: str):
         self._theme = theme
 
     def set_compliance(self, report: ScanReport):
+        self._report = report
         self.tree.clear()
         self.empty_label.setVisible(False)
+        self.btn_export.setEnabled(True)
 
         for i in reversed(range(self.score_layout.count())):
             self.score_layout.itemAt(i).widget().setParent(None)
@@ -70,7 +81,7 @@ class ComplianceTab(QWidget):
             std_item.setFont(0, font)
 
             for cid, cinfo in std_data["details"].items():
-                status_text = "Cumplido" if cinfo["status"] == "compliant" else "Incumplido"
+                status_text = self.tr("Cumplido") if cinfo["status"] == "compliant" else self.tr("Incumplido")
                 sev_summary = ", ".join(f"{sev}:{cnt}" for sev, cnt in sorted(cinfo.get("by_severity", {}).items()))
 
                 child = QTreeWidgetItem([
@@ -106,3 +117,20 @@ class ComplianceTab(QWidget):
             self.score_layout.addWidget(bar)
 
         self.tree.expandAll()
+
+    def _export_compliance(self):
+        if self._report is None:
+            return
+
+        file_path, _ = QFileDialog.getSaveFileName(
+            self, self.tr("Exportar cumplimiento"), "cumplimiento.json", self.tr("JSON (*.json)")
+        )
+        if not file_path:
+            return
+
+        from src.report.compliance import save_compliance_json
+        try:
+            save_compliance_json(self._report, file_path)
+            QMessageBox.information(self, self.tr("Exportado"), self.tr("Cumplimiento guardado en:\n{}").format(file_path))
+        except Exception as e:
+            QMessageBox.warning(self, self.tr("Error"), self.tr("No se pudo exportar:\n{}").format(e))

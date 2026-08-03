@@ -280,3 +280,70 @@ typescript:
     - encodeURI
     - decodeURI
     - open
+
+kotlin:
+  sources:
+    - 'request\.getParameter\('
+    - 'request\.parameter\b'
+    - 'request\.queryParameters\b'
+    - 'call\.request\.queryParameters\b'
+    - 'request\.headers\b'
+    - 'request\.cookies\b'
+    - 'readLine\(\)'
+    - '@RequestParam'
+    - '@PathVariable'
+    - '@RequestBody'
+  sinks:
+    - executeQuery
+    - executeUpdate
+    - execute
+    - exec
+    - eval
+    - openConnection
+    - getForObject
+    - postForObject
+    - sendRedirect
+    - write
+    - load
+
+swift:
+  sources:
+    - 'request\.query\b'
+    - 'request\.parameters\b'
+    - 'request\.headers\b'
+    - 'request\.cookies\b'
+    - 'request\.body\b'
+    - 'readLine\(\)'
+    - 'Console\.readLine'
+  sinks:
+    - execute
+    - query
+    - exec
+    - eval
+    - open
+    - write
+    - load
+
+rust:
+  sources:
+    - 'request\.query\b'
+    - 'request\.params\b'
+    - 'request\.headers\b'
+    - 'request\.cookies\b'
+    - 'request\.body\b'
+    - 'form\.get\(\)'
+    - 'query\.get\(\)'
+    - 'std::io::stdin'
+    - 'read_line\(\)'
+  sinks:
+    - execute
+    - query
+    - exec
+    - eval
+    - open
+    - write
+    - load
+    - run
+    - command
+    - spawn
+    - redirect

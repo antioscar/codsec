@@ -55,3 +55,24 @@ def test_parse_json_nested():
 
     result = parse_json_response('{"outer": {"inner": [1, 2, 3]}}')
     assert result == {"outer": {"inner": [1, 2, 3]}}
+
+
+def test_parse_json_escaped_quotes():
+    from src.llm.parsing import parse_json_response
+
+    result = parse_json_response('{"key": "value with \\"escaped\\" quotes"}')
+    assert result == {"key": 'value with "escaped" quotes'}
+
+
+def test_parse_json_balanced_brackets_invalid_inner():
+    from src.llm.parsing import parse_json_response
+
+    result = parse_json_response("Here is {invalid json content} in braces")
+    assert result is None
+
+
+def test_parse_json_backslash_in_string():
+    from src.llm.parsing import parse_json_response
+
+    result = parse_json_response('{"path": "C:\\\\Users\\\\test"}')
+    assert result == {"path": "C:\\Users\\test"}

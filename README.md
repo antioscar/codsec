@@ -2,10 +2,10 @@
 
 [![CI](https://github.com/antioscar/codsec/actions/workflows/ci.yml/badge.svg)](https://github.com/antioscar/codsec/actions/workflows/ci.yml)
 [![Python 3.14+](https://img.shields.io/badge/python-3.14+-blue.svg)](https://www.python.org/downloads/)
-[![Tests](https://img.shields.io/badge/tests-208%20passed-brightgreen.svg)](https://github.com/antioscar/codsec)
-[![Coverage](https://img.shields.io/badge/coverage-76%25-yellow.svg)](https://github.com/antioscar/codsec)
+[![Tests](https://img.shields.io/badge/tests-279%20passed-brightgreen.svg)](https://github.com/antioscar/codsec)
+[![Coverage](https://img.shields.io/badge/coverage-81%25-green.svg)](https://github.com/antioscar/codsec)
 
-Herramienta de análisis estático de seguridad (SAST) para webapps con escaneo paralelo. Escanea código fuente en Python, JavaScript, TypeScript, PHP, Java, Go, C# y Ruby mediante 20 categorías de reglas + análisis de taint (intra e interprocedimental) + dependencias vulnerables (9 formatos, consulta online OSV opcional), e integra inteligencia artificial (LLM) opcional. Incluye reporte de cumplimiento multi-estándar (ISO 27001:2022, ISO 27034, NIST SP 800-53, OWASP Top 10). Genera informes en PDF, HTML, JSON, SARIF, GitLab Code Quality y cumplimiento ISO. Distribuible como ejecutable único con PyInstaller.
+Herramienta de análisis estático de seguridad (SAST) para webapps con escaneo paralelo. Escanea código fuente en Python, JavaScript, TypeScript, PHP, Java, Go, C#, Ruby, Kotlin, Swift y Rust mediante 20 categorías de reglas + análisis de taint (intra e interprocedimental) + dependencias vulnerables (9 formatos, consulta online OSV opcional), e integra inteligencia artificial (LLM) opcional. Incluye reporte de cumplimiento multi-estándar (ISO 27001:2022, ISO 27034, NIST SP 800-53, OWASP Top 10). Genera informes en PDF, HTML, JSON, SARIF, GitLab Code Quality y cumplimiento ISO. Distribuible como ejecutable único con PyInstaller.
 
 **Incluye interfaz gráfica (GUI)** y línea de comandos (CLI).
 
@@ -34,16 +34,22 @@ python main_gui.py
 ```
 
 **Pestañas:**
-- Dashboard con KPIs (severidad + dependencias vulnerables), gráfico de barras y acciones principales
-- Tabla de hallazgos filtrable por severidad, categoría y búsqueda de texto
-- Visor de código con la línea afectada resaltada
-- Detalle con descripción y pasos de remediación
-- Pestaña de cumplimiento multi-estándar (ISO 27001, ISO 27034, NIST 800-53, OWASP Top 10)
-- Configuración: 8 lenguajes, severidad mínima, exclusiones, IA/LLM, baseline, reglas personalizadas, CVE online
-- Tema oscuro / claro con estilos completos en todos los componentes
-- Exportación: PDF, HTML, SARIF (Ctrl+E para PDF)
-- Atajos: `Ctrl+O` seleccionar carpeta, `Ctrl+R` analizar, `Ctrl+E` exportar PDF
-- Persistencia de configuración: última carpeta, geometría de ventana y tema
+- Dashboard con KPIs animados, gráfico de barras + donut, top findings y stats rápidos
+- Tabla de hallazgos con multi-selección, menú contextual y filtros colapsables
+- Visor de código con syntax highlighting y línea afectada resaltada
+- Detalle con descripción, remediación copiable y enlace CWE externo
+- Cumplimiento multi-estándar con exportación JSON integrada
+- Configuración reorganizada en 4 pestañas (General, Lenguajes, IA/LLM, Avanzado)
+- File tree navigator lateral con árbol de archivos del proyecto
+- Tema oscuro / claro con auto-detección del sistema y estilos refinados
+- Toast notifications no bloqueantes para acciones exitosas
+- Exportación: PDF, HTML, SARIF, cumplimiento JSON + export rápido toolbar (Ctrl+E para PDF)
+- Atajos: `Ctrl+O` seleccionar carpeta, `Ctrl+R` analizar, `Ctrl+E` exportar PDF, `Ctrl+?` ayuda
+- Proyectos recientes con menú desplegable en la toolbar
+- Progreso granular por fase (Reglas → Dependencias → IA)
+- Diálogo de confirmación al cancelar escaneo
+- Acerca de con versión y créditos
+- Persistencia de configuración: última carpeta, geometría de ventana, tema y proyectos recientes
 
 > **Tip:** Generá screenshots con la GUI sobre `tests/samples` para tu portafolio. Las 4 pestañas con resultados muestran todo el producto.
 
@@ -189,6 +195,9 @@ La configuración también se puede ajustar desde la GUI (pestaña Configuració
 - Go (`.go`) — reglas + AST + taint
 - C# (`.cs`) — reglas + AST + taint
 - Ruby (`.rb`) — reglas + AST + taint
+- Kotlin (`.kt`, `.kts`) — reglas + AST + taint
+- Swift (`.swift`) — reglas + AST + taint
+- Rust (`.rs`) — reglas + AST + taint
 
 ## Cómo agregar una regla nueva
 
@@ -254,7 +263,7 @@ Los campos:
 │   ├── discovery.py         # Descubrimiento de archivos
 │   ├── rules/
 │   │   ├── engine.py        # Motor de reglas + integración taint + supresión
-│   │   ├── parser.py        # Tree-sitter 8 lenguajes + mask_comments
+│   │   ├── parser.py        # Tree-sitter 11 lenguajes + mask_comments
 │   │   ├── regex_rules.py   # Aplicación de regex + heurísticas FP
 │   │   ├── taint.py         # Análisis de flujo de datos (intra + interprocedimental)
 │   │   └── suppression.py   # Supresión nosemgrep
@@ -269,10 +278,10 @@ Los campos:
 │   │   ├── app.py           # QApplication + theme
 │   │   ├── main_window.py   # QMainWindow: toolbar + tabs + export
 │   │   ├── themes.py        # QSS dark/light
-│   │   ├── scan_worker.py   # QThread background scan
+│   │   ├── scan_worker.py   # QThread background scan + phase signals
 │   │   ├── dashboard.py     # Resumen + gráfico de barras
 │   │   ├── findings_table.py # Tabla filtrable + visor + detalle
-│   │   ├── code_viewer.py   # Visor de código con resaltado
+│   │   ├── code_viewer.py   # Visor con syntax highlighting y números de línea
 │   │   ├── settings_panel.py # Config persistente + IA/LLM + baseline + reglas
 │   │   └── compliance_tab.py # Pestaña de cumplimiento multi-estándar
 │   └── llm/
@@ -282,8 +291,8 @@ Los campos:
 │       ├── semantic.py      # Análisis semántico libre
 │       └── remediation.py   # Mejora de remediación con IA
 └── tests/
-    ├── samples/             # Código vulnerable (8 lenguajes)
-    └── test_*.py            # 149 tests
+    ├── samples/             # Código vulnerable (11 lenguajes)
+    └── test_*.py            # 279 tests
 ```
 
 ## Cumplimiento ISO 27001:2022
@@ -372,4 +381,4 @@ python main.py -p . --fail-on high --no-llm
 python -m pytest tests/ -v
 ```
 
-208 tests cubriendo: reglas (20 categorías), AST, taint (intra + interprocedimental), dependencias (9 formatos + OSV online, +28 tests deps_online), IA/LLM, PDF, HTML, JSON, SARIF, GitLab Code Quality, compliance multi-estándar (ISO 27001, ISO 27034, NIST 800-53, OWASP Top 10), baseline, supresión, reglas personalizadas, exit codes CI/CD, e2e, GUI (17 tests), CLI en 8 lenguajes.
+279 tests cubriendo: reglas (20 categorías), AST, taint (intra + interprocedimental), dependencias (9 formatos + OSV online, +36 tests deps_online), IA/LLM (+23 tests provider/verifier/semantic/remediation/parsing), PDF, HTML, JSON, SARIF, GitLab Code Quality, compliance multi-estándar (ISO 27001, ISO 27034, NIST 800-53, OWASP Top 10), baseline, supresión, reglas personalizadas, exit codes CI/CD, e2e, GUI (35 tests), 11 lenguajes (Kotlin, Swift, Rust).

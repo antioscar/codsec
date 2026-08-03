@@ -7,6 +7,7 @@ from src.scanner import scan_project
 
 class ScanWorkerSignals(QObject):
     progress = Signal(int, int, str)
+    phase = Signal(str)
     finished = Signal(object)
     error = Signal(str)
 
@@ -48,12 +49,16 @@ class ScanWorker(QThread):
                     raise InterruptedError()
                 self.signals.progress.emit(current, total, file_path)
 
+            def _phase(phase_name: str):
+                self.signals.phase.emit(phase_name)
+
             report = scan_project(
                 target_path=self.target_path,
                 languages=self.languages,
                 min_severity=self.min_severity,
                 exclude_dirs=self.exclude_dirs,
                 on_progress=_progress,
+                on_phase=_phase,
                 use_llm=self.use_llm,
                 baseline_path=self.baseline_path,
                 new_only=self.new_only,

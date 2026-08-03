@@ -12,11 +12,12 @@
 | F | Paralelismo, taint interprocedimental, 7 reglas nuevas (→20), PyInstaller, compliance ISO 27001 | ~167 |
 | G | Tests deps_online, compliance multi-estándar, GUI ComplianceTab, CI GitHub Actions | **208** |
 | H | GUI polish (temas, empty states, QSettings, atajos, iconos), README showcase, ROADMAP.md | 208 |
+| I | GUI 2.0 (dashboard redesign, toast notifications, file tree navigator, multi-select, shortcut help, collapsible filters, settings tabs, detail panel enrich, export 1-click, theme contrast) | 279 |
 
 ## Estado actual (Fase H completada)
 
-- **208 tests pasando**, 76% coverage (gate CI ≥75%)
-- 20 categorías de reglas, 4 estándares de compliance
+- **279 tests pasando**, 81% coverage (gate CI ≥75%)
+- 20 categorías de reglas, 4 estándares de compliance, 11 lenguajes (Kotlin, Swift, Rust)
 - GUI con temas oscuro/claro responsivos, QSettings, atajos de teclado, empty states
 - Exe PyInstaller (`dist/analizador-seguridad/analizador-seguridad.exe`)
 - CI en GitHub Actions (Windows + Ubuntu)
@@ -24,18 +25,18 @@
 ## Prioridades futuras
 
 ### Alta
-- [ ] i18n: extraer todos los strings hardcodeados a `self.tr()` + generar `.ts`
-- [ ] Syntax highlighting en el CodeViewer (Pygments o tree-sitter)
-- [ ] Soporte para más lenguajes (Kotlin, Swift, Rust)
-- [ ] Mejorar coverage a ≥80% (cubrir paths de LLM y GUI no testeados)
+- [x] i18n: extraer todos los strings hardcodeados a `self.tr()` + generar `.ts` (i18n/codsec_es.ts, 87 strings)
+- [x] Syntax highlighting en el CodeViewer (tree-sitter)
+- [x] Soporte para más lenguajes (Kotlin, Swift, Rust)
+- [x] Mejorar coverage a ≥80% (cubrir paths de LLM y GUI no testeados)
 
 ### Media
-- [ ] Auto-detección de tema del sistema (`QStyleHints.colorScheme()`)
-- [ ] Menú de proyectos recientes (MRU en QSettings)
-- [ ] Progress granular por fase (parsing → reglas → taint → deps → LLM)
-- [ ] Exportación de compliance desde la pestaña GUI
-- [ ] About dialog con versión y créditos
-- [ ] Cancelar con confirmación (dialog al cancelar escaneo)
+- [x] Auto-detección de tema del sistema (`QStyleHints.colorScheme()`)
+- [x] Menú de proyectos recientes (MRU en QSettings)
+- [x] Progress granular por fase (parsing → reglas → taint → deps → LLM)
+- [x] Exportación de compliance desde la pestaña GUI
+- [x] About dialog con versión y créditos
+- [x] Cancelar con confirmación (dialog al cancelar escaneo)
 
 ### Baja
 - [ ] Tests del path LLM en scanner (hoy mockeado, falta integración real)

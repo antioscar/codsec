@@ -10,7 +10,7 @@ remediation: |
   4. PHP: evita `exec()`, `system()`, `passthru()`, `shell_exec()` con input de usuario. Usa `escapeshellarg()`.
   5. Java: evita `Runtime.exec()` con strings concatenados.
 
-languages: [python, javascript, typescript, php, java, go, csharp, ruby]
+languages: [python, javascript, typescript, php, java, go, csharp, ruby, kotlin, swift, rust]
 
 ast_node_types: []
 

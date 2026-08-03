@@ -8,6 +8,7 @@ languages:
   - typescript
   - php
   - go
+  - kotlin
 ast_function_names:
   - render_template_string
   - Template

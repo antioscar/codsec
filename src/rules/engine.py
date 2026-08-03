@@ -23,7 +23,7 @@ def load_rules(rules_dir: Optional[str] = None, validate: bool = True) -> list[R
     errors: list[str] = []
     seen_ids: set[str] = set()
     valid_severities = {"critical", "high", "medium", "low"}
-    valid_languages = {"python", "javascript", "typescript", "php", "java", "go", "csharp", "ruby"}
+    valid_languages = {"python", "javascript", "typescript", "php", "java", "go", "csharp", "ruby", "kotlin", "swift", "rust"}
 
     for filename in sorted(os.listdir(rules_dir)):
         if not filename.endswith((".yaml", ".yml")):

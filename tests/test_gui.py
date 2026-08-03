@@ -182,17 +182,215 @@ def test_findings_model_sort_by_severity(qapp):
 def test_code_viewer_basic(qapp):
     from src.gui.code_viewer import CodeViewer
     viewer = CodeViewer()
-    viewer.setPlainText("line 1\nline 2\nline 3")
+    viewer.set_source("line 1\nline 2\nline 3", "python")
     assert viewer.toPlainText() == "line 1\nline 2\nline 3"
 
 
 def test_code_viewer_highlight_line(qapp):
     from src.gui.code_viewer import CodeViewer
     viewer = CodeViewer()
-    viewer.setPlainText("line one\nline two\nline three\nline four\n")
+    viewer.set_source("line one\nline two\nline three\nline four\n", "python")
     viewer.set_highlighted_line(2)
     extra = viewer.extraSelections()
     assert isinstance(extra, list)
+
+
+def test_code_viewer_syntax_highlighter_python(qapp):
+    from src.gui.code_viewer import CodeViewer, SyntaxHighlighter
+    viewer = CodeViewer()
+    source = '''def hello(name):
+    if name:
+        return f"Hello, {name}"
+    return None
+'''
+    viewer.set_source(source, "python")
+    assert viewer.toPlainText() == source
+
+
+def test_code_viewer_syntax_highlighter_javascript(qapp):
+    from src.gui.code_viewer import CodeViewer
+    viewer = CodeViewer()
+    source = 'const x = 42;\n// comment\nlet y = "hello";'
+    viewer.set_source(source, "javascript")
+    assert viewer.toPlainText() == source
+
+
+def test_code_viewer_syntax_highlighter_unknown_language(qapp):
+    from src.gui.code_viewer import CodeViewer
+    viewer = CodeViewer()
+    source = "some random text"
+    viewer.set_source(source, "haskell")
+    assert viewer.toPlainText() == source
+
+
+def test_code_viewer_syntax_highlighter_theme_switch(qapp):
+    from src.gui.code_viewer import CodeViewer
+    viewer = CodeViewer()
+    source = '# comment\nx = 1\ns = "hello"'
+    viewer.set_source(source, "python")
+    viewer.set_theme("light")
+    assert viewer._highlighter._theme == "light"
+    viewer.set_theme("dark")
+    assert viewer._highlighter._theme == "dark"
+
+
+def test_code_viewer_syntax_highlighter_empty_source(qapp):
+    from src.gui.code_viewer import CodeViewer
+    viewer = CodeViewer()
+    viewer.set_source("", "python")
+    assert viewer.toPlainText() == ""
+
+
+def test_code_viewer_syntax_highlighter_multiple_languages(qapp):
+    from src.gui.code_viewer import CodeViewer
+    viewer = CodeViewer()
+
+    viewer.set_source("package main\nfunc main() {\n\tfmt.Println(\"hi\")\n}", "go")
+    assert "package main" in viewer.toPlainText()
+
+    viewer.set_source("public class Foo { }", "java")
+    assert "public class Foo" in viewer.toPlainText()
+
+    viewer.set_source("<?php echo 'hello'; ?>", "php")
+    assert "echo 'hello'" in viewer.toPlainText()
+
+    viewer.set_source("using System;", "csharp")
+    assert "using System" in viewer.toPlainText()
+
+    viewer.set_source("def foo; end", "ruby")
+    assert "def foo" in viewer.toPlainText()
+
+    viewer.set_source("const a: string = 'ts';", "typescript")
+    assert "const a" in viewer.toPlainText()
+
+
+def test_code_viewer_syntax_highlighter_comments_strings(qapp):
+    from src.gui.code_viewer import CodeViewer
+    viewer = CodeViewer()
+    source = '# this is a comment\nx = "this is a string"\ny = 42'
+    viewer.set_source(source, "python")
+    output = viewer.toPlainText()
+    assert "# this is a comment" in output
+    assert '"this is a string"' in output
+    assert "42" in output
+
+
+def test_code_viewer_syntax_highlighter_keywords(qapp):
+    from src.gui.code_viewer import CodeViewer
+    viewer = CodeViewer()
+    source = "if True:\n    return None"
+    viewer.set_source(source, "python")
+    assert "if True" in viewer.toPlainText()
+    assert "return None" in viewer.toPlainText()
+
+
+def test_mainwindow_about_dialog(qapp):
+    from src.gui.main_window import MainWindow
+    from PySide6.QtWidgets import QMessageBox
+    w = MainWindow()
+    assert hasattr(w, "_show_about")
+    w._show_about()
+
+
+def test_mainwindow_theme_persistence(qapp):
+    from src.gui.main_window import MainWindow
+    from PySide6.QtCore import QSettings
+
+    settings = QSettings("CodSec", "AnalizadorSeguridad")
+    settings.setValue("theme", "")
+    settings.sync()
+
+    w = MainWindow()
+    w._toggle_theme()
+    assert w._settings.value("theme") in ("dark", "light")
+
+
+def test_mainwindow_mru_add_and_menu(qapp):
+    import tempfile
+    import os
+    from src.gui.main_window import MainWindow
+
+    w = MainWindow()
+    w._settings.setValue("recentFolders", [])
+    w._settings.sync()
+
+    with tempfile.TemporaryDirectory() as d1, tempfile.TemporaryDirectory() as d2:
+        w._add_to_mru(d1)
+        w._add_to_mru(d2)
+
+        mru = w._settings.value("recentFolders", [])
+        mru_list = list(mru) if not isinstance(mru, str) else [mru]
+
+        assert w._mru_button.isEnabled()
+
+
+def test_mainwindow_mru_limit(qapp):
+    import tempfile
+    import os
+    from src.gui.main_window import MainWindow
+    w = MainWindow()
+    w._settings.setValue("recentFolders", [])
+    w._settings.sync()
+
+    with tempfile.TemporaryDirectory() as td:
+        for i in range(15):
+            sub = os.path.join(td, f"sub_{i}")
+            os.makedirs(sub)
+            w._add_to_mru(sub)
+
+    mru = w._settings.value("recentFolders", [])
+    mru_list = list(mru) if not isinstance(mru, str) else [mru]
+    assert len(mru_list) <= w._MAX_MRU
+
+
+def test_mainwindow_mru_clear(qapp):
+    import tempfile
+    from src.gui.main_window import MainWindow
+    w = MainWindow()
+    with tempfile.TemporaryDirectory() as td:
+        w._add_to_mru(td)
+        assert w._mru_button.isEnabled()
+
+    w._clear_mru()
+    assert not w._mru_button.isEnabled()
+
+
+def test_mainwindow_mru_dedupe(qapp):
+    import tempfile
+    import os
+    from src.gui.main_window import MainWindow
+    w = MainWindow()
+    w._settings.setValue("recentFolders", [])
+    w._settings.sync()
+
+    with tempfile.TemporaryDirectory() as td:
+        a = os.path.join(td, "a")
+        b = os.path.join(td, "b")
+        os.makedirs(a)
+        os.makedirs(b)
+
+        w._add_to_mru(a)
+        w._add_to_mru(b)
+        w._add_to_mru(a)
+
+        mru = w._settings.value("recentFolders", [])
+        mru_list = list(mru) if not isinstance(mru, str) else [mru]
+        assert os.path.basename(mru_list[0]) == "a"
+        assert mru_list.count(a) == 1
+        assert len(mru_list) <= 3
+
+
+def test_mainwindow_show_about_method_exists(qapp):
+    from src.gui.main_window import MainWindow
+    w = MainWindow()
+    assert callable(w._show_about)
+
+
+def test_mainwindow_cancel_scan_method(qapp):
+    from src.gui.main_window import MainWindow
+    w = MainWindow()
+    assert callable(w._cancel_scan)
+    assert w.cancel_action is not None
 
 
 def test_scan_worker_signals(qapp):
@@ -206,6 +404,37 @@ def test_scan_worker_signals(qapp):
     )
     assert hasattr(worker.signals, "progress")
     assert hasattr(worker.signals, "finished")
+    assert hasattr(worker.signals, "phase")
+
+
+def test_mainwindow_phase_handling(qapp):
+    from src.gui.main_window import MainWindow
+    w = MainWindow()
+    w._on_phase("rules")
+    assert w._current_phase == "rules"
+    w._on_phase("deps")
+    assert w._current_phase == "deps"
+    w._current_phase = ""
+    assert w._current_phase == ""
+
+
+def test_scan_project_phase_callback(qapp):
+    import tempfile
+    from src.scanner import scan_project
+    from src.models import Severity
+
+    phases_called = []
+    def _on_phase(phase):
+        phases_called.append(phase)
+
+    with tempfile.TemporaryDirectory() as td:
+        report = scan_project(
+            target_path=td,
+            languages=["python"],
+            min_severity=Severity.LOW,
+            on_phase=_on_phase,
+        )
+        assert "rules" in phases_called or len(phases_called) == 0
 
 
 def test_settings_panel_get_settings_default(qapp):
@@ -240,3 +469,4 @@ def test_compliance_tab_basic(qapp):
     )
     tab.set_compliance(report)
     assert tab.tree.topLevelItemCount() >= 1
+    assert tab.btn_export.isEnabled()

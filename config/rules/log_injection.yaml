@@ -11,6 +11,9 @@ languages:
   - go
   - csharp
   - ruby
+  - kotlin
+  - swift
+  - rust
 ast_function_names:
   - info
   - warning

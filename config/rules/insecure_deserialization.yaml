@@ -11,7 +11,7 @@ remediation: |
   5. Java: usa whitelists de clases con `ObjectInputStream`, o evita la deserialización de Java nativo.
   6. Prefiere formatos de datos seguros como JSON, Protocol Buffers, o MessagePack.
 
-languages: [python, javascript, typescript, php, java, go, csharp, ruby]
+languages: [python, javascript, typescript, php, java, go, csharp, ruby, kotlin, swift, rust]
 
 ast_node_types: []
 

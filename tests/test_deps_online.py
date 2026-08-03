@@ -2,7 +2,7 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
-from unittest.mock import patch, MagicMock
+from unittest.mock import patch, MagicMock, mock_open
 
 from src.deps_online import (
     _ecosystem_to_osv,
@@ -12,6 +12,7 @@ from src.deps_online import (
     _save_cache,
     _query_osv_batch,
     scan_dependencies_online,
+    CACHE_FILE,
 )
 
 
@@ -171,6 +172,24 @@ class TestIsVersionAffected:
         ]
         result, fixed = _is_version_affected("1.0.0", affected)
         assert result is False
+
+    def test_is_version_affected_fixed_from_ranges(self):
+        affected = [
+            {
+                "versions": ["1.0.0"],
+                "ranges": [
+                    {
+                        "type": "ECOSYSTEM",
+                        "events": [
+                            {"fixed": "2.0.0"},
+                        ],
+                    }
+                ],
+            }
+        ]
+        result, fixed = _is_version_affected("1.0.0", affected)
+        assert result is True
+        assert fixed == "2.0.0"
 
 
 class TestScanDependenciesOnline:
@@ -425,3 +444,84 @@ class TestScanDependenciesOnline:
 
         cves = {r["cve"] for r in results}
         assert cves == {"CVE-2023-PY", "CVE-2023-JS"}
+
+
+class TestCacheLoad:
+    def test_cache_load_invalid_json(self):
+        with patch.object(Path, "exists", return_value=True), \
+             patch("builtins.open", mock_open(read_data="not valid json")):
+            result = _load_cache()
+            assert result == {}
+
+    def test_cache_load_non_dict_data(self):
+        with patch.object(Path, "exists", return_value=True), \
+             patch("builtins.open", mock_open(read_data="[]")):
+            result = _load_cache()
+            assert result == {}
+
+    def test_cache_load_file_not_found(self):
+        with patch.object(Path, "exists", return_value=False):
+            result = _load_cache()
+            assert result == {}
+
+
+class TestQueryOsvBatch:
+    def test_query_osv_batch_httpx_not_installed(self):
+        import builtins
+        original_import = builtins.__import__
+
+        def mock_import(name, *args, **kwargs):
+            if name == "httpx":
+                raise ImportError("No module named httpx")
+            return original_import(name, *args, **kwargs)
+
+        with patch("builtins.__import__", side_effect=mock_import):
+            result = _query_osv_batch(
+                [{"package": {"name": "test", "ecosystem": "PyPI"}}]
+            )
+            assert result == {}
+
+    def test_query_osv_batch_success(self):
+        import sys
+        mock_post_resp = MagicMock()
+        mock_post_resp.json.return_value = {
+            "vulns": [{"id": "CVE-123", "summary": "test"}]
+        }
+        mock_client = MagicMock()
+        mock_client.post.return_value = mock_post_resp
+        mock_httpx = MagicMock()
+        mock_httpx.Client.return_value.__enter__.return_value = mock_client
+
+        with patch.dict(sys.modules, {"httpx": mock_httpx}):
+            result = _query_osv_batch(
+                [{"package": {"name": "test", "ecosystem": "PyPI"}}]
+            )
+            assert "PyPI:test" in result
+            assert len(result["PyPI:test"]) == 1
+            assert result["PyPI:test"][0]["id"] == "CVE-123"
+
+    def test_query_osv_batch_http_error(self):
+        import sys
+        mock_client = MagicMock()
+        mock_client.post.side_effect = Exception("HTTP error")
+        mock_httpx = MagicMock()
+        mock_httpx.Client.return_value.__enter__.return_value = mock_client
+
+        with patch.dict(sys.modules, {"httpx": mock_httpx}):
+            result = _query_osv_batch(
+                [{"package": {"name": "test", "ecosystem": "PyPI"}}]
+            )
+            assert result == {"PyPI:test": []}
+
+
+class TestSaveCache:
+    def test_save_cache(self):
+        with patch.object(Path, "mkdir") as mock_mkdir, \
+             patch("src.deps_online.json.dump") as mock_json_dump, \
+             patch("builtins.open") as mock_open_fn:
+            _save_cache({"key": "value"})
+            mock_mkdir.assert_called_once()
+            mock_open_fn.assert_called_once_with(
+                str(CACHE_FILE), "w", encoding="utf-8"
+            )
+            mock_json_dump.assert_called_once()

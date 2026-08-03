@@ -12,6 +12,9 @@ LANGUAGE_EXTENSIONS: dict[str, list[str]] = {
     "go": [".go"],
     "csharp": [".cs"],
     "ruby": [".rb"],
+    "kotlin": [".kt", ".kts"],
+    "swift": [".swift"],
+    "rust": [".rs"],
 }
 
 EXCLUDE_DIRS: set[str] = {

@@ -11,7 +11,7 @@ remediation: |
   5. PHP: evita `eval()`, `preg_replace()` con modificador /e, `create_function()`.
   6. La ejecución de código en tiempo de ejecución casi siempre se puede evitar rediseñando la lógica.
 
-languages: [python, javascript, typescript, php, java, go, csharp, ruby]
+languages: [python, javascript, typescript, php, java, go, csharp, ruby, kotlin, swift, rust]
 
 ast_node_types: []
 

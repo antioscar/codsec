@@ -100,3 +100,21 @@ def test_enhance_all_progress():
     findings = [_make_finding()]
     enhance_all_remediations(findings, client, on_progress=lambda c, t, m: progress_calls.append((c, t)))
     assert progress_calls == [(1, 1)]
+
+
+def test_enhance_one_chat_error_fallback():
+    from src.llm.remediation import enhance_remediation
+
+    finding = _make_finding()
+    original = finding.remediation
+
+    class ErrorClient:
+        def chat(self, messages, temperature=None):
+            raise Exception("Chat error")
+
+        def close(self):
+            pass
+
+    client = ErrorClient()
+    result = enhance_remediation(finding, client)
+    assert result == original

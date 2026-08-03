@@ -16,6 +16,10 @@ def test_language_from_extension():
     assert language_from_extension("main.go") == "go"
     assert language_from_extension("Controller.cs") == "csharp"
     assert language_from_extension("app.rb") == "ruby"
+    assert language_from_extension("Main.kt") == "kotlin"
+    assert language_from_extension("script.kts") == "kotlin"
+    assert language_from_extension("app.swift") == "swift"
+    assert language_from_extension("main.rs") == "rust"
     assert language_from_extension("README.md") is None
     assert language_from_extension("Makefile") is None
 

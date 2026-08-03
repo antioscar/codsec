@@ -10,6 +10,9 @@ languages:
   - go
   - csharp
   - php
+  - kotlin
+  - swift
+  - rust
 regex_patterns:
   - (?i)\.extractall\s*\(
   - (?i)extractall\s*\(

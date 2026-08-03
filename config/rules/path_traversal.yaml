@@ -11,7 +11,7 @@ remediation: |
   5. JS: `path.resolve()` y verifica que no escape del directorio base.
   6. Usa whitelists de nombres de archivo permitidos en lugar de blacklists de caracteres peligrosos.
 
-languages: [python, javascript, typescript, php, java, go, csharp, ruby]
+languages: [python, javascript, typescript, php, java, go, csharp, ruby, kotlin, swift, rust]
 
 ast_node_types: []
 

@@ -12,7 +12,7 @@ remediation: |
   6. JS/Express: valida la URL con una lista de hosts permitidos antes de `res.redirect()`.
   7. PHP: valida con `parse_url()` y whitelist antes de `header('Location: ...')`.
 
-languages: [python, javascript, typescript, php, java, go, csharp, ruby]
+languages: [python, javascript, typescript, php, java, go, csharp, ruby, kotlin, swift, rust]
 
 ast_node_types: []
 

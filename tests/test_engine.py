@@ -305,3 +305,188 @@ def test_tsx_parses():
         rules = load_rules()
         findings = analyze_file(file_path, "tsx", rules)
         assert len(findings) >= 0
+
+
+def test_load_rules_skips_empty_yaml():
+    import yaml
+    with tempfile.TemporaryDirectory() as rules_dir:
+        yaml_path = Path(rules_dir, "empty.yaml")
+        yaml_path.write_text("   \n# just a comment\n")
+        rules = load_rules(rules_dir=rules_dir)
+        assert isinstance(rules, list)
+
+
+def test_load_rules_validates_missing_id():
+    import yaml
+    with tempfile.TemporaryDirectory() as rules_dir:
+        rule_data = {
+            "category": "xss",
+            "severity": "high",
+            "languages": ["python"],
+            "patterns": ["xss_pattern"],
+        }
+        yaml_path = Path(rules_dir, "missing_id.yaml")
+        with open(yaml_path, "w") as f:
+            yaml.dump(rule_data, f)
+
+        import io
+        import sys
+        captured = io.StringIO()
+        old_stderr = sys.stderr
+        sys.stderr = captured
+        try:
+            rules = load_rules(rules_dir=rules_dir, validate=True)
+        finally:
+            sys.stderr = old_stderr
+
+        output = captured.getvalue()
+        assert "falta el campo 'id'" in output
+
+
+def test_load_rules_validates_duplicate_id():
+    import yaml
+    with tempfile.TemporaryDirectory() as rules_dir:
+        rule_data = {
+            "id": "DUP-001",
+            "category": "xss",
+            "severity": "high",
+            "languages": ["python"],
+            "patterns": ["xss_pattern"],
+        }
+        Path(rules_dir, "rule_a.yaml").write_text(yaml.dump(rule_data))
+        rule_data2 = dict(rule_data)
+        rule_data2["category"] = "sql_injection"
+        Path(rules_dir, "rule_b.yaml").write_text(yaml.dump(rule_data2))
+
+        import io
+        import sys
+        captured = io.StringIO()
+        old_stderr = sys.stderr
+        sys.stderr = captured
+        try:
+            rules = load_rules(rules_dir=rules_dir, validate=True)
+        finally:
+            sys.stderr = old_stderr
+
+        output = captured.getvalue()
+        assert "duplicado" in output
+
+
+def test_load_rules_validates_unknown_language():
+    import yaml
+    with tempfile.TemporaryDirectory() as rules_dir:
+        rule_data = {
+            "id": "BAD-LANG",
+            "category": "xss",
+            "severity": "high",
+            "languages": ["foobar"],
+            "patterns": ["xss_pattern"],
+        }
+        Path(rules_dir, "unknown_lang.yaml").write_text(yaml.dump(rule_data))
+
+        import io
+        import sys
+        captured = io.StringIO()
+        old_stderr = sys.stderr
+        sys.stderr = captured
+        try:
+            rules = load_rules(rules_dir=rules_dir, validate=True)
+        finally:
+            sys.stderr = old_stderr
+
+        output = captured.getvalue()
+        assert "lenguajes desconocidos" in output
+
+
+def test_analyze_file_parse_fallback():
+    from unittest.mock import patch
+    with tempfile.TemporaryDirectory() as tmp:
+        file_path = str(Path(tmp, "app.txt"))
+        Path(file_path).write_text('API_KEY = "sk-1234567890abcdef1234567890abcdef"')
+
+        rules = load_rules()
+        with patch("src.rules.engine.parse_file", return_value=None):
+            findings = analyze_file(file_path, "python", rules)
+        assert len(findings) >= 1
+        assert any("secret" in f.category for f in findings)
+
+
+def test_analyze_kotlin_sqli():
+    with tempfile.TemporaryDirectory() as tmp:
+        file_path = str(Path(tmp, "test.kt"))
+        Path(file_path).write_text(
+            'fun search(query: String) {\n'
+            '    val q = "SELECT * FROM items WHERE name = \'" + query + "\'"\n'
+            '    stmt.executeQuery(q)\n'
+            '}\n'
+        )
+        rules = load_rules()
+        findings = analyze_file(file_path, "kotlin", rules)
+        assert len(findings) >= 1
+        assert any(f.category == "sql_injection" for f in findings)
+
+
+def test_analyze_kotlin_secrets():
+    with tempfile.TemporaryDirectory() as tmp:
+        file_path = str(Path(tmp, "config.kt"))
+        Path(file_path).write_text(
+            'val apiKey = "sk-1234567890abcdef1234567890abcdef"\n'
+        )
+        rules = load_rules()
+        findings = analyze_file(file_path, "kotlin", rules)
+        assert len(findings) >= 1
+        assert any(f.category == "hardcoded_secrets" for f in findings)
+
+
+def test_analyze_swift_sqli():
+    with tempfile.TemporaryDirectory() as tmp:
+        file_path = str(Path(tmp, "app.swift"))
+        Path(file_path).write_text(
+            'func search(query: String) {\n'
+            '    let sql = "SELECT * FROM items WHERE name = \'" + query + "\'"\n'
+            '    db.execute(sql)\n'
+            '}\n'
+        )
+        rules = load_rules()
+        findings = analyze_file(file_path, "swift", rules)
+        assert len(findings) >= 1
+        assert any(f.category == "sql_injection" for f in findings)
+
+
+def test_analyze_swift_secrets():
+    with tempfile.TemporaryDirectory() as tmp:
+        file_path = str(Path(tmp, "config.swift"))
+        Path(file_path).write_text(
+            'let apiKey = "sk-abcdef1234567890abcdef123456"\n'
+        )
+        rules = load_rules()
+        findings = analyze_file(file_path, "swift", rules)
+        assert len(findings) >= 1
+        assert any(f.category == "hardcoded_secrets" for f in findings)
+
+
+def test_analyze_rust_sqli():
+    with tempfile.TemporaryDirectory() as tmp:
+        file_path = str(Path(tmp, "main.rs"))
+        Path(file_path).write_text(
+            'fn search(query: &str) {\n'
+            '    let sql = "SELECT * FROM items WHERE name = \'" + query;\n'
+            '    conn.execute(sql, []);\n'
+            '}\n'
+        )
+        rules = load_rules()
+        findings = analyze_file(file_path, "rust", rules)
+        assert len(findings) >= 1
+        assert any(f.category == "sql_injection" for f in findings)
+
+
+def test_analyze_rust_secrets():
+    with tempfile.TemporaryDirectory() as tmp:
+        file_path = str(Path(tmp, "config.rs"))
+        Path(file_path).write_text(
+            'let api_key = "sk-1234567890abcdef1234567890abcdef";\n'
+        )
+        rules = load_rules()
+        findings = analyze_file(file_path, "rust", rules)
+        assert len(findings) >= 1
+        assert any(f.category == "hardcoded_secrets" for f in findings)

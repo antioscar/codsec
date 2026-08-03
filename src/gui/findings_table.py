@@ -4,6 +4,7 @@ from PySide6.QtWidgets import (
     QWidget, QVBoxLayout, QHBoxLayout, QSplitter, QTableView,
     QHeaderView, QCheckBox, QComboBox, QLineEdit, QLabel,
     QAbstractItemView, QGroupBox, QTextEdit, QStackedWidget,
+    QApplication, QMenu, QPushButton,
 )
 from PySide6.QtCore import Qt, QSortFilterProxyModel, QAbstractTableModel, QModelIndex, Signal
 from PySide6.QtGui import QColor
@@ -65,7 +66,7 @@ class FindingsModel(QAbstractTableModel):
             elif col == 5:
                 return str(finding.line_number)
             elif col == 6:
-                labels = {"high": "Alta", "medium": "Media", "low": "Baja"}
+                labels = {"high": self.tr("Alta"), "medium": self.tr("Media"), "low": self.tr("Baja")}
                 return labels.get(finding.confidence, finding.confidence)
 
         if role == Qt.ItemDataRole.ForegroundRole:
@@ -94,7 +95,8 @@ class FindingsModel(QAbstractTableModel):
 
     def headerData(self, section, orientation, role=Qt.ItemDataRole.DisplayRole):
         if orientation == Qt.Orientation.Horizontal and role == Qt.ItemDataRole.DisplayRole:
-            return self.COLUMNS[section]
+            return self.tr(self.COLUMNS[section])
+
         return None
 
     def get_finding(self, row: int) -> Finding | None:
@@ -117,13 +119,13 @@ class FindingsTable(QWidget):
         filter_layout = QHBoxLayout(self.filter_widget)
         filter_layout.setContentsMargins(8, 4, 8, 4)
 
-        self.chk_critical = QCheckBox("Crítica")
+        self.chk_critical = QCheckBox(self.tr("Crítica"))
         self.chk_critical.setChecked(True)
-        self.chk_high = QCheckBox("Alta")
+        self.chk_high = QCheckBox(self.tr("Alta"))
         self.chk_high.setChecked(True)
-        self.chk_medium = QCheckBox("Media")
+        self.chk_medium = QCheckBox(self.tr("Media"))
         self.chk_medium.setChecked(True)
-        self.chk_low = QCheckBox("Baja")
+        self.chk_low = QCheckBox(self.tr("Baja"))
         self.chk_low.setChecked(True)
 
         for cb in [self.chk_critical, self.chk_high, self.chk_medium, self.chk_low]:
@@ -135,22 +137,35 @@ class FindingsTable(QWidget):
         filter_layout.addWidget(self.chk_low)
         filter_layout.addSpacing(20)
 
-        filter_layout.addWidget(QLabel("Categoría:"))
+        filter_layout.addWidget(QLabel(self.tr("Categoría:")))
         self.cmb_category = QComboBox()
-        self.cmb_category.addItem("Todas")
+        self.cmb_category.addItem(self.tr("Todas"))
         self.cmb_category.currentTextChanged.connect(self._apply_filters)
         filter_layout.addWidget(self.cmb_category)
 
         filter_layout.addSpacing(10)
-        filter_layout.addWidget(QLabel("Buscar:"))
+        filter_layout.addWidget(QLabel(self.tr("Buscar:")))
         self.txt_search = QLineEdit()
-        self.txt_search.setPlaceholderText("Buscar archivo, CWE...")
+        self.txt_search.setPlaceholderText(self.tr("Buscar archivo, CWE..."))
         self.txt_search.textChanged.connect(self._apply_filters)
         filter_layout.addWidget(self.txt_search)
 
+        self._filter_widgets = [self.chk_critical, self.chk_high, self.chk_medium, self.chk_low,
+                                self.cmb_category, self.txt_search]
+        for i in range(filter_layout.count()):
+            widget = filter_layout.itemAt(i).widget()
+            if widget is not None and isinstance(widget, QLabel):
+                self._filter_widgets.append(widget)
+
+        self.btn_toggle_filters = QPushButton(self.tr("▼"))
+        self.btn_toggle_filters.setFixedWidth(28)
+        self.btn_toggle_filters.clicked.connect(self._toggle_filters)
+        filter_layout.addWidget(self.btn_toggle_filters)
+        self._filters_expanded = True
+
         layout.addWidget(self.filter_widget)
 
-        self.empty_label = QLabel("Ejecute un análisis para ver los hallazgos")
+        self.empty_label = QLabel(self.tr("Ejecute un análisis para ver los hallazgos"))
         self.empty_label.setStyleSheet("color: #6a6a8a; font-size: 16px;")
         self.empty_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
         layout.addWidget(self.empty_label)
@@ -170,7 +185,9 @@ class FindingsTable(QWidget):
         self.table = QTableView()
         self.table.setModel(self.proxy_model)
         self.table.setSelectionBehavior(QAbstractItemView.SelectionBehavior.SelectRows)
-        self.table.setSelectionMode(QAbstractItemView.SelectionMode.SingleSelection)
+        self.table.setSelectionMode(QAbstractItemView.SelectionMode.ExtendedSelection)
+        self.table.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
+        self.table.customContextMenuRequested.connect(self._show_context_menu)
         self.table.setAlternatingRowColors(True)
         self.table.setSortingEnabled(True)
         self.table.horizontalHeader().setStretchLastSection(True)
@@ -185,10 +202,11 @@ class FindingsTable(QWidget):
         bottom_splitter = QSplitter(Qt.Orientation.Horizontal)
 
         self.code_viewer = CodeViewer()
-        self.detail_panel = QGroupBox("Detalle del hallazgo")
+        self.detail_panel = QGroupBox(self.tr("Detalle del hallazgo"))
         detail_layout = QVBoxLayout(self.detail_panel)
         self.lbl_title = QLabel()
         self.lbl_title.setWordWrap(True)
+        self.lbl_title.setOpenExternalLinks(True)
         self.lbl_title.setStyleSheet("font-size: 13px; font-weight: bold;")
         detail_layout.addWidget(self.lbl_title)
 
@@ -199,8 +217,12 @@ class FindingsTable(QWidget):
         self.txt_remediation = QTextEdit()
         self.txt_remediation.setReadOnly(True)
         self.txt_remediation.setMaximumHeight(200)
-        detail_layout.addWidget(QLabel("Remediación:"))
+        detail_layout.addWidget(QLabel(self.tr("Remediación:")))
         detail_layout.addWidget(self.txt_remediation)
+
+        self.btn_copy_remediation = QPushButton(self.tr("📋 Copiar remediación"))
+        self.btn_copy_remediation.clicked.connect(self._copy_remediation)
+        detail_layout.addWidget(self.btn_copy_remediation)
         detail_layout.addStretch()
 
         bottom_splitter.addWidget(self.code_viewer)
@@ -216,6 +238,59 @@ class FindingsTable(QWidget):
         content_layout.addWidget(splitter)
         layout.addWidget(self._content)
 
+    def _show_context_menu(self, pos):
+        menu = QMenu(self.table)
+
+        action_copy_paths = menu.addAction(self.tr("Copiar ruta(s) al portapapeles"))
+        action_filter = menu.addAction(self.tr("Filtrar por esta categoría"))
+        menu.addSeparator()
+        action_select_all = menu.addAction(self.tr("Seleccionar todas"))
+        action_deselect_all = menu.addAction(self.tr("Deseleccionar todas"))
+
+        action = menu.exec(self.table.mapToGlobal(pos))
+
+        if action == action_copy_paths:
+            lines = []
+            for idx in self.table.selectionModel().selectedRows():
+                source_idx = self.proxy_model.mapToSource(idx)
+                finding = self.model.get_finding(source_idx.row())
+                if finding:
+                    lines.append(f"{finding.file_path}:{finding.line_number}")
+            if lines:
+                QApplication.clipboard().setText("\n".join(lines))
+
+        elif action == action_filter:
+            indexes = self.table.selectionModel().selectedRows()
+            if indexes:
+                source_idx = self.proxy_model.mapToSource(indexes[0])
+                finding = self.model.get_finding(source_idx.row())
+                if finding:
+                    cat_text = finding.category.replace("_", " ").title()
+                    idx = self.cmb_category.findText(cat_text)
+                    if idx >= 0:
+                        self.cmb_category.setCurrentIndex(idx)
+
+        elif action == action_select_all:
+            self.table.selectAll()
+
+        elif action == action_deselect_all:
+            self.table.clearSelection()
+
+    def _toggle_filters(self):
+        self._filters_expanded = not self._filters_expanded
+        self.btn_toggle_filters.setText(self.tr("▼") if self._filters_expanded else self.tr("▲"))
+        for widget in self._filter_widgets:
+            widget.setVisible(self._filters_expanded)
+
+    def _copy_remediation(self):
+        indexes = self.table.selectionModel().selectedRows()
+        if not indexes:
+            return
+        source_idx = self.proxy_model.mapToSource(indexes[0])
+        finding = self.model.get_finding(source_idx.row())
+        if finding:
+            QApplication.clipboard().setText(finding.remediation)
+
     def set_findings(self, findings: list[Finding]):
         self._findings = findings
         self.model.set_findings(findings)
@@ -230,7 +305,7 @@ class FindingsTable(QWidget):
         categories = sorted(set(f.category for f in findings))
         self.cmb_category.blockSignals(True)
         self.cmb_category.clear()
-        self.cmb_category.addItem("Todas")
+        self.cmb_category.addItem(self.tr("Todas"))
         for cat in categories:
             self.cmb_category.addItem(cat.replace("_", " ").title(), cat)
         self.cmb_category.blockSignals(False)
@@ -241,13 +316,13 @@ class FindingsTable(QWidget):
 
         sev_filter = []
         if self.chk_critical.isChecked():
-            sev_filter.append("Crítica")
+            sev_filter.append(self.tr("Crítica"))
         if self.chk_high.isChecked():
-            sev_filter.append("Alta")
+            sev_filter.append(self.tr("Alta"))
         if self.chk_medium.isChecked():
-            sev_filter.append("Media")
+            sev_filter.append(self.tr("Media"))
         if self.chk_low.isChecked():
-            sev_filter.append("Baja")
+            sev_filter.append(self.tr("Baja"))
 
         category = self.cmb_category.currentData() or self.cmb_category.currentText().lower().replace(" ", "_")
         search = self.txt_search.text().strip()
@@ -261,7 +336,7 @@ class FindingsTable(QWidget):
             if str(finding.severity) not in sev_filter:
                 visible = False
 
-            if category and category != "todas" and finding.category != category:
+            if category and category != self.tr("todas") and finding.category != category:
                 visible = False
 
             if search:
@@ -288,11 +363,15 @@ class FindingsTable(QWidget):
         self.findingSelected.emit(finding)
 
         color = SEVERITY_COLORS_QCOLOR.get(finding.severity, QColor("#ffffff")).name()
+        cwe_display = finding.cwe
+        if finding.cwe.startswith("CWE-"):
+            cwe_num = finding.cwe[4:]
+            cwe_display = f"<a href='https://cwe.mitre.org/data/definitions/{cwe_num}.html'>{finding.cwe}</a>"
         self.lbl_title.setText(
             f"[<span style='color:{color};font-weight:bold;'>{str(finding.severity).upper()}</span>] "
-            f"{finding.category.replace('_', ' ').title()} — {finding.cwe}"
+            f"{finding.category.replace('_', ' ').title()} — {cwe_display}"
         )
-        self.lbl_description.setText(f"<b>Descripción:</b> {finding.description}")
+        self.lbl_description.setText(self.tr("<b>Descripción:</b> {}").format(finding.description))
 
         remediation_html = finding.remediation.replace("\n", "<br>")
         self.txt_remediation.setHtml(remediation_html)
@@ -300,7 +379,7 @@ class FindingsTable(QWidget):
         try:
             with open(finding.file_path, "r", encoding="utf-8", errors="replace") as f:
                 source = f.read()
-            self.code_viewer.setPlainText(source)
+            self.code_viewer.set_source(source, finding.language)
             self.code_viewer.set_highlighted_line(finding.line_number,
                                                   SEVERITY_COLORS_QCOLOR.get(finding.severity))
 
@@ -311,4 +390,4 @@ class FindingsTable(QWidget):
                 self.code_viewer.setTextCursor(cursor)
                 self.code_viewer.centerCursor()
         except Exception:
-            self.code_viewer.setPlainText(finding.code_snippet)
+            self.code_viewer.set_source(finding.code_snippet, finding.language)

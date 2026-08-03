@@ -5,6 +5,7 @@ cwe: CWE-90
 languages:
   - python
   - java
+  - kotlin
   - javascript
   - typescript
   - php

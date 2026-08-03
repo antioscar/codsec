@@ -15,7 +15,7 @@ remediation: |
   9. Express: usa `helmet` middleware.
   10. Spring: `SecurityHeadersConfig` o `headers()` en SecurityConfig.
 
-languages: [python, javascript, typescript, php, java, go, csharp, ruby]
+languages: [python, javascript, typescript, php, java, go, csharp, ruby, kotlin, swift, rust]
 
 ast_node_types: []
 

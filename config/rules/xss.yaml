@@ -11,7 +11,7 @@ remediation: |
   5. PHP: usa `htmlspecialchars()` al renderizar en HTML.
   6. Valida y sanitiza cualquier input de usuario antes de mostrarlo.
 
-languages: [python, javascript, typescript, php, java, go, csharp, ruby]
+languages: [python, javascript, typescript, php, java, go, csharp, ruby, kotlin, swift, rust]
 
 ast_node_types: []
 

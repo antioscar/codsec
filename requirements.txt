@@ -7,6 +7,9 @@ tree-sitter-go==0.25.0
 tree-sitter-c-sharp==0.23.5
 tree-sitter-ruby==0.23.1
 tree-sitter-typescript==0.23.2
+tree-sitter-kotlin==1.1.0
+tree-sitter-swift==0.7.3
+tree-sitter-rust==0.24.2
 reportlab==4.3.1
 PyYAML==6.0.2
 click==8.4.2

@@ -1,6 +1,8 @@
 from __future__ import annotations
 from pathlib import Path
 import json
+import tempfile
+from unittest.mock import patch
 
 from src.models import Finding, Severity, ScanReport
 from src.report.compliance import (
@@ -8,6 +10,7 @@ from src.report.compliance import (
     compliance_summary,
     to_compliance_json,
     _load_all_standards,
+    save_compliance_json,
 )
 
 
@@ -137,3 +140,32 @@ def test_compliance_owasp_a03_multiple():
     a03 = evaluation["OWASP Top 10 (2021)"]["details"]["A03"]
     assert a03["status"] == "non_compliant"
     assert a03["total_findings"] == 2
+
+
+@patch("src.report.compliance.COMPLIANCE_DIR")
+def test_missing_compliance_dir(mock_compliance_dir):
+    mock_compliance_dir.exists.return_value = False
+    standards = _load_all_standards()
+    assert standards == {}
+
+
+def test_save_compliance_json():
+    finding = Finding(
+        id="SQLI-0001", category="sql_injection", severity=Severity.HIGH,
+        cwe="CWE-89", language="python", file_path="app.py",
+        line_number=10, code_snippet="execute(query)", description="SQLi",
+        remediation="Use params", confidence="high",
+    )
+    report = ScanReport(
+        target_path="test", total_files_scanned=1, total_findings=1,
+        findings=[finding], scan_duration_seconds=0.1,
+    )
+
+    with tempfile.TemporaryDirectory() as tmp:
+        output_path = str(Path(tmp, "compliance.json"))
+        save_compliance_json(report, output_path)
+        assert Path(output_path).exists()
+        with open(output_path, "r") as f:
+            data = json.load(f)
+        assert "standards" in data
+        assert "controls_total_evaluated" in data
