@@ -1,0 +1,30 @@
+id: REDIR-001
+category: open_redirect
+severity: high
+cwe: "CWE-601"
+description_template: "Posible Open Redirect: redirección a URL controlada por el usuario"
+remediation: |
+  1. No redirijas a URLs proporcionadas por el usuario sin validación.
+  2. Implementa una whitelist de URLs o dominios permitidos.
+  3. Valida que la URL de destino comience con '/' o sea un path relativo.
+  4. Usa redirecciones relativas siempre que sea posible.
+  5. Python/Django: usa `django.utils.http.is_safe_url()` o `url_has_allowed_host_and_scheme()`.
+  6. JS/Express: valida la URL con una lista de hosts permitidos antes de `res.redirect()`.
+  7. PHP: valida con `parse_url()` y whitelist antes de `header('Location: ...')`.
+
+languages: [python, javascript, typescript, php, java, go, csharp, ruby]
+
+ast_node_types: []
+
+ast_function_names:
+  - redirect
+  - HttpResponseRedirect
+  - redirectPermanent
+
+regex_patterns:
+  - '(?i)(redirect|HttpResponseRedirect|redirectPermanent)\s*\(\s*request\.(GET|POST|args|query)'
+  - '(?i)res\.redirect\s*\(\s*req\.(query|params|body)'
+  - '(?i)header\s*\(\s*[\x27"]Location:\s*[\x27"\s]*.*\$_(GET|POST|REQUEST)'
+  - '(?i)response\.sendRedirect\s*\(.*request\.getParameter'
+  - '(?i)window\.location\s*=\s*.*(location\.search|\.hash)'
+  - '(?i)\.replace\s*\(\s*.*(location\.search|\.hash|req\.)'

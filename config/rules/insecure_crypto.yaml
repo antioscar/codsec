@@ -1,0 +1,25 @@
+id: CRYPTO-001
+category: insecure_crypto
+severity: medium
+cwe: "CWE-327"
+description_template: "Uso de algoritmo criptográfico débil u obsoleto detectado"
+remediation: |
+  1. No uses MD5 o SHA1 para hashing de contraseñas o firmas.
+  2. Para contraseñas: usa bcrypt, scrypt, argon2, o PBKDF2 con salt.
+  3. Para integridad: usa SHA-256 o SHA-3.
+  4. Python: usa `hashlib.sha256()` en vez de `hashlib.md5()`, `bcrypt` para contraseñas.
+  5. JS: usa `crypto.createHash('sha256')` en vez de `md5`.
+  6. No implementes criptografía propia, usa librerías estándar y auditadas.
+
+languages: [python, javascript, typescript, php, java, go, csharp, ruby]
+
+ast_node_types: []
+
+ast_function_names: []
+
+regex_patterns:
+  - '(?i)(hashlib\.md5|hashlib\.sha1|md5\s*\(|sha1\s*\()'
+  - '(?i)crypto\.createHash\s*\(\s*["\x27](md5|sha1)["\x27]'
+  - '(?i)new\s+CryptoJS\.MD5'
+  - '(?i)(md5|sha1)\s*\(\s*\$\w+'
+  - '(?i)MessageDigest\.getInstance\s*\(\s*["\x27](MD5|SHA-1|SHA1)["\x27]'

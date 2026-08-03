@@ -1,0 +1,9 @@
+node_modules/
+dist/
+build/
+cache/
+.pytest_cache/
+.coverage
+__pycache__/
+*.pyc
+informe_seguridad.*

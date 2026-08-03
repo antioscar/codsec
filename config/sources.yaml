@@ -1,0 +1,282 @@
+python:
+  sources:
+    - 'request\.GET\.(get|__getitem__)'
+    - 'request\.POST\.(get|__getitem__)'
+    - 'request\.args\.(get|__getitem__)'
+    - 'request\.form\.(get|__getitem__)'
+    - 'request\.data\.(get|__getitem__)'
+    - 'request\.query_params\.(get|__getitem__)'
+    - 'request\.headers\.(get|__getitem__)'
+    - 'request\.COOKIES\.(get|__getitem__)'
+    - 'request\.FILES\.(get|__getitem__)'
+    - 'request\.environ\.(get|__getitem__)'
+    - 'input\('
+    - 'sys\.stdin\.read'
+    - 'self\.request\.(GET|POST|args)'
+  sinks:
+    - execute
+    - executemany
+    - raw
+    - execSQL
+    - eval
+    - exec
+    - system
+    - popen
+    - call
+    - run
+    - loads
+    - load
+    - open
+    - urlopen
+    - get
+    - post
+    - put
+    - delete
+    - head
+    - patch
+    - redirect
+    - HttpResponseRedirect
+    - redirectPermanent
+
+javascript:
+  sources:
+    - 'req\.(query|params|body|headers|cookies)\b'
+    - 'req\.(get|param|header|cookie)\('
+    - 'request\.(query|params|body|headers|cookies)\b'
+    - 'window\.location\b'
+    - 'document\.getElement'
+    - 'document\.querySelector'
+    - 'location\.(search|hash|href)\b'
+    - 'URLSearchParams'
+    - 'req\.url\b'
+    - 'req\.originalUrl\b'
+  sinks:
+    - query
+    - raw
+    - exec
+    - eval
+    - execFile
+    - spawn
+    - execSync
+    - render
+    - send
+    - redirect
+    - write
+    - writeFile
+    - readFile
+    - JSON.parse
+    - fetch
+    - get
+    - post
+    - put
+    - delete
+    - Function
+    - createHash
+    - encodeURI
+    - decodeURI
+    - open
+
+php:
+  sources:
+    - '\$_GET\b'
+    - '\$_POST\b'
+    - '\$_REQUEST\b'
+    - '\$_COOKIE\b'
+    - '\$_FILES\b'
+    - '\$_SERVER\b'
+    - 'filter_input\('
+    - 'file_get_contents\('
+    - 'php://input'
+  sinks:
+    - mysqli_query
+    - mysql_query
+    - pg_query
+    - query
+    - exec
+    - system
+    - shell_exec
+    - passthru
+    - popen
+    - proc_open
+    - eval
+    - unserialize
+    - file_get_contents
+    - include
+    - require
+    - fopen
+    - header
+    - echo
+    - print
+
+java:
+  sources:
+    - 'request\.getParameter\('
+    - 'request\.getParameterValues\('
+    - 'request\.getHeader\('
+    - 'request\.getQueryString\('
+    - 'request\.getInputStream'
+    - 'request\.getReader'
+    - '@RequestParam'
+    - '@PathVariable'
+    - '@RequestBody'
+    - 'request\.getSession'
+    - 'request\.getCookies'
+  sinks:
+    - executeQuery
+    - executeUpdate
+    - execute
+    - exec
+    - eval
+    - readObject
+    - readAllBytes
+    - getInputStream
+    - openConnection
+    - getForObject
+    - postForObject
+    - sendRedirect
+    - getWriter
+    - write
+    - load
+
+go:
+  sources:
+    - 'r\.FormValue\('
+    - 'r\.PostFormValue\('
+    - 'r\.URL\.Query\('
+    - 'r\.Header\.Get\('
+    - 'r\.Cookie\('
+    - 'r\.Header\b'
+    - 'r\.Body\b'
+    - 'c\.Request\.FormValue\('
+    - 'c\.Request\.URL\.Query\('
+    - 'c\.Query\('
+    - 'c\.Param\('
+  sinks:
+    - Query
+    - QueryRow
+    - Exec
+    - Command
+    - CombinedOutput
+    - Output
+    - Run
+    - Start
+    - ExecuteTemplate
+    - Open
+    - OpenFile
+    - ReadAll
+    - Get
+    - Post
+    - Head
+    - Do
+    - WriteString
+    - Write
+    - Redirect
+    - ServeFile
+    - Parse
+    - Create
+
+csharp:
+  sources:
+    - 'Request\.QueryString\b'
+    - 'Request\.Form\b'
+    - 'Request\.Headers\b'
+    - 'Request\.Cookies\b'
+    - 'Request\.Params\b'
+    - 'Request\.InputStream\b'
+    - 'Console\.ReadLine\('
+    - 'FromQuery'
+    - 'FromForm'
+    - 'FromBody'
+  sinks:
+    - ExecuteReader
+    - ExecuteNonQuery
+    - ExecuteScalar
+    - ExecuteXmlReader
+    - Start
+    - Redirect
+    - RedirectToAction
+    - RedirectToRoute
+    - Write
+    - Response\.Write
+    - Server\.Execute
+    - Transfer
+    - ReadAllBytes
+    - ReadAllText
+    - ReadToEnd
+    - GetString
+    - SendAsync
+    - PostAsync
+
+ruby:
+  sources:
+    - 'params\['
+    - 'request\.query_parameters'
+    - 'request\.parameters'
+    - 'cookies\['
+    - 'env\['
+    - 'request\.env\b'
+    - 'request\.raw_post\b'
+    - 'request\.body\.read\b'
+    - 'gets\b'
+    - 'readline\b'
+  sinks:
+    - execute
+    - exec_query
+    - find_by_sql
+    - system
+    - exec
+    - spawn
+    - eval
+    - send
+    - render
+    - redirect_to
+    - open
+    - read
+    - readlines
+    - write
+    - load
+    - Marshal\.load
+    - YAML\.load
+    - File\.open
+    - Kernel\.open
+
+typescript:
+  sources:
+    - 'req\.(query|params|body|headers|cookies)\b'
+    - 'req\.(get|param|header|cookie)\('
+    - 'request\.(query|params|body|headers|cookies)\b'
+    - 'window\.location\b'
+    - 'document\.getElement'
+    - 'document\.querySelector'
+    - 'location\.(search|hash|href)\b'
+    - 'URLSearchParams'
+    - 'req\.url\b'
+    - 'req\.originalUrl\b'
+    - 'ctx\.request\.body\b'
+    - 'ctx\.query\b'
+    - 'ctx\.params\b'
+  sinks:
+    - query
+    - raw
+    - exec
+    - eval
+    - execFile
+    - spawn
+    - execSync
+    - render
+    - send
+    - redirect
+    - write
+    - writeFile
+    - readFile
+    - JSON.parse
+    - fetch
+    - get
+    - post
+    - put
+    - delete
+    - Function
+    - createHash
+    - encodeURI
+    - decodeURI
+    - open

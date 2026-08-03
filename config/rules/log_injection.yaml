@@ -1,0 +1,36 @@
+id: LOGINJ-001
+category: log_injection
+severity: medium
+cwe: CWE-117
+languages:
+  - python
+  - javascript
+  - typescript
+  - php
+  - java
+  - go
+  - csharp
+  - ruby
+ast_function_names:
+  - info
+  - warning
+  - error
+  - debug
+  - log
+  - println
+  - printf
+regex_patterns:
+  - (?i)(logging|logger)\.\w+\s*\(\s*.*f["']
+  - (?i)(logging|logger)\.\w+\s*\(\s*.*\s*\+.*\b(request|input|param|get|post)
+  - (?i)console\.(log|error|warn|debug|info)\s*\(.*\b(request\.(body|query|params)|req)
+  - (?i)System\.out\.println\s*\(.*\b(request|input)
+  - (?i)error_log\s*\(.*\$
+  - (?i)log\.Print[fl]?\s*\(.*r\.(Form|PostForm|Query)
+  - (?i)Console\.WriteLine\s*\(.*\b(Request|Input)
+  - (?i)Rails\.logger\.\w+\s*\(.*\$\{.*(params|request)
+description_template: "Posible log injection: entrada de usuario sin sanitizar en logs permite falsificación de entradas"
+remediation: |
+  1. Sanitizá las entradas de usuario eliminando o escapando caracteres de nueva línea (\\n, \\r).
+  2. Truncá o encodeá la entrada del usuario antes de loguearla.
+  3. Usá logging estructurado (JSON) donde los datos de usuario van como campos separados, no interpolados.
+  4. Nunca loguees datos de usuario directamente; usá variables contextuales.

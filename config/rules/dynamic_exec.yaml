@@ -1,0 +1,26 @@
+id: EVAL-001
+category: dynamic_exec
+severity: high
+cwe: "CWE-95"
+description_template: "Ejecución dinámica de código detectada (eval/exec/Function)"
+remediation: |
+  1. Evita `eval()`, `exec()`, `Function()` con datos dinámicos.
+  2. Si necesitas ejecutar código dinámico, usa sandboxing o alternativas seguras.
+  3. Python: evita `eval()` y `exec()`. Si necesitas evaluar expresiones simples, usa `ast.literal_eval()`.
+  4. JS/TS: no uses `eval()` ni `new Function()`. Para parsear JSON usa `JSON.parse()`.
+  5. PHP: evita `eval()`, `preg_replace()` con modificador /e, `create_function()`.
+  6. La ejecución de código en tiempo de ejecución casi siempre se puede evitar rediseñando la lógica.
+
+languages: [python, javascript, typescript, php, java, go, csharp, ruby]
+
+ast_node_types: []
+
+ast_function_names: []
+
+regex_patterns:
+  - '(?i)\beval\s*\('
+  - '(?i)\bexec\s*\('
+  - '(?i)new\s+Function\s*\('
+  - '(?i)create_function\s*\('
+  - '(?i)preg_replace\s*\([^,]*\/e'
+  - '(?i)ScriptEngine.*\.eval\s*\('

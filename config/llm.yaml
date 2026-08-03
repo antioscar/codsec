@@ -1,0 +1,20 @@
+provider: ollama
+base_url: http://localhost:11434
+model: qwen2.5-coder
+timeout: 60
+temperature: 0.1
+
+openai_compatible:
+  base_url: https://api.openai.com/v1
+  model: gpt-4o-mini
+  api_key_env: OPENAI_API_KEY
+
+features:
+  verify: true
+  semantic: true
+  remediation: true
+
+enabled: false
+
+max_verify_findings: 30
+max_semantic_files: 20

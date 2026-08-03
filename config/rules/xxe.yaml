@@ -1,0 +1,36 @@
+id: XXE-001
+category: xxe
+severity: critical
+cwe: CWE-611
+languages:
+  - python
+  - javascript
+  - typescript
+  - php
+  - java
+  - csharp
+ast_function_names:
+  - parse
+  - fromstring
+  - XMLParser
+  - loadXML
+regex_patterns:
+  - (?i)\.fromstring\s*\(
+  - (?i)\.ElementTree\.parse\s*\(
+  - (?i)minidom\.parse\s*\(
+  - (?i)XMLParser\s*\(
+  - (?i)loadXML\s*\(
+  - (?i)DocumentBuilderFactory\.newInstance\s*\(
+  - (?i)XmlReader\.Create\s*\(
+  - (?i)LOADXML\s*\(
+  - (?i)simplexml_load_string\s*\(
+  - (?i)libxml_disable_entity_loader\s*\(\s*false\s*\)
+description_template: "Posible XXE (XML External Entity): parser XML configurado para permitir entidades externas"
+remediation: |
+  1. Deshabilitá entidades externas en el parser XML:
+     - Python lxml: usar etree.XMLParser(resolve_entities=False)
+     - Python defusedxml: usar defusedxml.ElementTree.parse()
+     - Java: setFeature("http://apache.org/xml/features/disallow-doctype-decl", true)
+     - PHP: libxml_disable_entity_loader(true)
+  2. Deshabilitá DTD completamente si no es necesario.
+  3. Usá bibliotecas seguras como defusedxml (Python) que bloquean XXE por defecto.

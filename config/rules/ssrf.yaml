@@ -1,0 +1,25 @@
+id: SSRF-001
+category: ssrf
+severity: high
+cwe: "CWE-918"
+description_template: "Posible SSRF: petición HTTP a URL controlada por el usuario"
+remediation: |
+  1. No permitas que los usuarios especifiquen URLs arbitrarias para peticiones del servidor.
+  2. Implementa una whitelist de dominios/hosts permitidos.
+  3. Bloquea accesos a IPs internas (127.0.0.1, 10.x, 172.16-31.x, 192.168.x).
+  4. Valida que la URL apunte solo a protocolos http/https, no file://, gopher://, etc.
+  5. Python: usa una lista de hosts permitidos con `urllib.parse.urlparse()`.
+  6. JS: valida la URL antes de pasarla a `axios`, `fetch`, `http.request`.
+
+languages: [python, javascript, typescript, php, java, go, csharp, ruby]
+
+ast_node_types: []
+
+ast_function_names: []
+
+regex_patterns:
+  - '(?i)(requests\.(get|post|put|delete|head|patch)|httpx\.(get|post)|urllib\.request\.urlopen)\s*\(.*request\.'
+  - '(?i)(fetch|axios\.(get|post|put|delete)|http\.request|https\.request)\s*\(.*req\.'
+  - '(?i)(file_get_contents|curl_exec)\s*\(.*\$_(GET|POST|REQUEST)'
+  - '(?i)new\s+URL\s*\(.*request\.getParameter'
+  - '(?i)RestTemplate.*\.(getForObject|postForObject)\s*\(.*request\.'

@@ -1,0 +1,28 @@
+id: CSRF-001
+category: csrf
+severity: high
+cwe: "CWE-352"
+description_template: "Posible falta de protección CSRF en endpoint de mutación"
+remediation: |
+  1. Incluye tokens CSRF en todos los formularios y peticiones de estado (POST, PUT, DELETE, PATCH).
+  2. Django: usa `{% csrf_token %}` en templates y el middleware `CsrfViewMiddleware`.
+  3. Flask: usa Flask-WTF con `CSRFProtect` o `flask-seasurf`.
+  4. Express/Node: usa `csurf` o tokens en headers personalizados.
+  5. Laravel: incluye `@csrf` en formularios Blade.
+  6. Spring: habilita CSRF protection (activado por defecto) o usa `CsrfToken` en formularios.
+  7. Para APIs, usa tokens en headers (ej. `X-CSRF-Token`) en vez de cookies.
+
+languages: [python, javascript, typescript, php, java, go, csharp, ruby]
+
+ast_node_types: []
+
+ast_function_names: []
+
+regex_patterns:
+  - '(?i)@app\.(route|post|put|delete|patch)'
+  - '(?i)@router\.(post|put|delete|patch)'
+  - '(?i)app\.(post|put|delete|patch)\s*\('
+  - '(?i)router\.(post|put|delete|patch)\s*\('
+  - '(?i)Route::(post|put|delete|patch)\s*\('
+  - '(?i)@PostMapping|@PutMapping|@DeleteMapping|@PatchMapping'
+  - '(?i)http\.(post|put|delete|patch)\s*\('

@@ -1,0 +1,40 @@
+id: WEAKHASH-001
+category: weak_hash
+severity: high
+cwe: CWE-328
+languages:
+  - python
+  - javascript
+  - typescript
+  - php
+  - java
+  - go
+  - csharp
+  - ruby
+ast_function_names:
+  - md5
+  - sha1
+  - Digest::SHA1
+regex_patterns:
+  - (?i)hashlib\.md5\s*\(
+  - (?i)hashlib\.sha1\s*\(
+  - (?i)\.createHash\s*\(\s*['"]md5['"]
+  - (?i)\.createHash\s*\(\s*['"]sha1['"]
+  - (?i)crypto\.createHash\s*\(\s*['"](md5|sha1)['"]
+  - (?i)MessageDigest\.getInstance\s*\(\s*['"](MD5|SHA-1)['"]
+  - (?i)crypto/md5
+  - (?i)crypto/sha1
+  - (?i)MD5\.Create\s*\(
+  - (?i)SHA1\.Create\s*\(
+  - (?i)SHA1Managed\s*\(
+  - (?i)md5\s*\(\s*
+  - (?i)sha1\s*\(\s*
+  - (?i)Digest::MD5
+  - (?i)Digest::SHA1
+description_template: "Uso de algoritmo de hash criptográficamente débil (MD5 o SHA-1) que puede indicar password hashing inseguro"
+remediation: |
+  1. Para passwords: usá bcrypt, scrypt, Argon2 o PBKDF2 con salt aleatorio.
+  2. Para integridad de datos: usá al menos SHA-256 de la familia SHA-2 o SHA-3.
+  3. Si estás migrando, implementá actualización progresiva (rehash on login).
+  4. Python: usa hashlib.sha256() o passlib/bcrypt para passwords.
+  5. Java: usa MessageDigest.getInstance("SHA-256") o BCrypt para passwords.

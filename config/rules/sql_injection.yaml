@@ -1,0 +1,29 @@
+id: SQLI-001
+category: sql_injection
+severity: critical
+cwe: "CWE-89"
+description_template: "Posible SQL injection detectada: ejecución de consulta SQL con concatenación de variables"
+remediation: |
+  1. Usa consultas parametrizadas (prepared statements) en lugar de concatenar strings.
+  2. Python: usa parámetros con `cursor.execute(query, params)`.
+  3. JS: usa placeholders con `db.query('SELECT * FROM users WHERE id = ?', [userId])`.
+  4. PHP: usa PDO con prepared statements.
+  5. Java: usa PreparedStatement en JDBC.
+  6. Si debes construir queries dinámicas, sanitiza y escapa todas las entradas.
+
+languages: [python, javascript, typescript, php, java, go, csharp, ruby]
+
+ast_node_types: []
+
+ast_function_names:
+  - execute
+  - executemany
+  - query
+  - raw
+  - execSQL
+
+regex_patterns:
+  - '(?i)(SELECT|INSERT|UPDATE|DELETE|DROP|ALTER|CREATE)\s+.+\s*(?:\+|\bf\{|\.format\(|f["\x27]|\s*\.\s*).*'
+  - '(?i)\.execute\s*\(\s*["\x27].*%'
+  - '(?i)\.raw\s*\(\s*.*\+'
+  - '(?i)(mysqli_query|mysql_query|pg_query|sqlite_query)\s*\(.*\$'

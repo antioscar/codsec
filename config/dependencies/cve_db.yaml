@@ -1,0 +1,303 @@
+vulnerabilities:
+  # Python
+  - package: django
+    ecosystem: pypi
+    cve: "CVE-2024-53907"
+    severity: high
+    affected: "<4.2.18,>=5.0,<5.1.4"
+    description: "Django: Potential SQL injection via JSON fields"
+    fixed: ">=4.2.18,>=5.1.4"
+
+  - package: flask
+    ecosystem: pypi
+    cve: "CVE-2023-30861"
+    severity: high
+    affected: "<2.3.2"
+    description: "Flask: Information disclosure via session cookie"
+    fixed: ">=2.3.2"
+
+  - package: requests
+    ecosystem: pypi
+    cve: "CVE-2023-32681"
+    severity: medium
+    affected: "<2.31.0"
+    description: "Requests: Proxy-Authorization header leak on redirect"
+    fixed: ">=2.31.0"
+
+  - package: pillow
+    ecosystem: pypi
+    cve: "CVE-2024-28219"
+    severity: high
+    affected: "<10.3.0"
+    description: "Pillow: Buffer overflow in _imagingcms.c"
+    fixed: ">=10.3.0"
+
+  - package: pyyaml
+    ecosystem: pypi
+    cve: "CVE-2022-45142"
+    severity: medium
+    affected: "<6.0"
+    description: "PyYAML: FullLoader unsafe deserialization"
+    fixed: ">=6.0"
+
+  # JavaScript / Node
+  - package: express
+    ecosystem: npm
+    cve: "CVE-2024-29041"
+    severity: high
+    affected: "<4.19.2"
+    description: "Express: Open redirect in redirect()"
+    fixed: ">=4.19.2"
+
+  - package: lodash
+    ecosystem: npm
+    cve: "CVE-2021-23337"
+    severity: high
+    affected: "<4.17.21"
+    description: "Lodash: Command injection via template"
+    fixed: ">=4.17.21"
+
+  - package: axios
+    ecosystem: npm
+    cve: "CVE-2024-23331"
+    severity: high
+    affected: "<1.6.3"
+    description: "Axios: SSRF via forged protocol"
+    fixed: ">=1.6.3"
+
+  - package: jsonwebtoken
+    ecosystem: npm
+    cve: "CVE-2022-23529"
+    severity: high
+    affected: "<9.0.0"
+    description: "jsonwebtoken: Remote code execution in verify()"
+    fixed: ">=9.0.0"
+
+  - package: mongodb
+    ecosystem: npm
+    cve: "CVE-2021-32050"
+    severity: medium
+    affected: "<4.1.1"
+    description: "mongodb: Prototype pollution via BSON"
+    fixed: ">=4.1.1"
+
+  - package: moment
+    ecosystem: npm
+    cve: "CVE-2022-24785"
+    severity: high
+    affected: "<2.29.2"
+    description: "Moment.js: ReDoS in parsing date formats"
+    fixed: ">=2.29.2"
+
+  - package: semver
+    ecosystem: npm
+    cve: "CVE-2022-25883"
+    severity: high
+    affected: "<7.5.2"
+    description: "semver: ReDoS in range parsing"
+    fixed: ">=7.5.2"
+
+  # PHP / Composer
+  - package: laravel/framework
+    ecosystem: composer
+    cve: "CVE-2024-2757"
+    severity: high
+    affected: "<11.1.1"
+    description: "Laravel: Author ID validation bypass via manipulated UUID"
+    fixed: ">=11.1.1"
+
+  - package: guzzlehttp/guzzle
+    ecosystem: composer
+    cve: "CVE-2023-29197"
+    severity: high
+    affected: "<7.7.0"
+    description: "Guzzle: Cookie persistence bypass via malformed Set-Cookie"
+    fixed: ">=7.7.0"
+
+  - package: symfony/framework-bundle
+    ecosystem: composer
+    cve: "CVE-2024-3661"
+    severity: medium
+    affected: "<6.4.7,>=7.0,<7.0.7"
+    description: "Symfony: Missing cookie domain validation"
+    fixed: ">=6.4.7,>=7.0.7"
+
+  - package: spatie/laravel-ignition
+    ecosystem: composer
+    cve: "CVE-2024-23897"
+    severity: critical
+    affected: "<2.8.0"
+    description: "Laravel Ignition: Unauthenticated code execution"
+    fixed: ">=2.8.0"
+
+  # Java / Maven
+  - package: org.springframework:spring-web
+    ecosystem: maven
+    cve: "CVE-2024-22233"
+    severity: high
+    affected: "<6.1.2"
+    description: "Spring Web: DoS via crafted HTTP requests"
+    fixed: ">=6.1.2"
+
+  - package: com.fasterxml.jackson.core:jackson-databind
+    ecosystem: maven
+    cve: "CVE-2023-35116"
+    severity: high
+    affected: "<2.16.0"
+    description: "Jackson-databind: Deserialization vulnerability via crafted JSON"
+    fixed: ">=2.16.0"
+
+  - package: org.apache.logging.log4j:log4j-core
+    ecosystem: maven
+    cve: "CVE-2021-44228"
+    severity: critical
+    affected: ">=2.0,<2.17.1"
+    description: "Log4Shell: Remote code execution via JNDI lookup in log messages"
+    fixed: ">=2.17.1"
+
+  - package: org.springframework.boot:spring-boot-starter
+    ecosystem: maven
+    cve: "CVE-2023-20873"
+    severity: high
+    affected: "<3.0.6"
+    description: "Spring Boot: Security bypass via SpEL expressions"
+    fixed: ">=3.0.6"
+
+  # Go
+  - package: golang.org/x/net
+    ecosystem: go
+    cve: "CVE-2024-45338"
+    severity: high
+    affected: "<0.33.0"
+    description: "x/net: Non-linear parsing of case-insensitive header tokens"
+    fixed: ">=0.33.0"
+
+  - package: github.com/gin-gonic/gin
+    ecosystem: go
+    cve: "CVE-2023-26125"
+    severity: medium
+    affected: "<1.9.0"
+    description: "Gin: Header injection via X-Forwarded-Host"
+    fixed: ">=1.9.0"
+
+  - package: github.com/labstack/echo
+    ecosystem: go
+    cve: "CVE-2023-30765"
+    severity: high
+    affected: "<4.11.0"
+    description: "Echo: SSRF via redirect following"
+    fixed: ">=4.11.0"
+
+  - package: github.com/gorilla/websocket
+    ecosystem: go
+    cve: "CVE-2023-44462"
+    severity: high
+    affected: "<1.5.1"
+    description: "Gorilla WebSocket: DoS via large messages"
+    fixed: ">=1.5.1"
+
+  - package: go.mongodb.org/mongo-driver
+    ecosystem: go
+    cve: "CVE-2024-27289"
+    severity: high
+    affected: "<1.13.2"
+    description: "MongoDB Go Driver: SSRF via crafted connection strings"
+    fixed: ">=1.13.2"
+
+  - package: golang.org/x/crypto
+    ecosystem: go
+    cve: "CVE-2024-24576"
+    severity: critical
+    affected: "<0.17.0"
+    description: "x/crypto: Command injection via crafted filenames"
+    fixed: ">=0.17.0"
+
+  # Ruby
+  - package: actionpack
+    ecosystem: ruby
+    cve: "CVE-2024-26144"
+    severity: medium
+    affected: "<7.1.3.1"
+    description: "Rails Action Pack: ReDoS via crafted Accept headers"
+    fixed: ">=7.1.3.1"
+
+  - package: rails
+    ecosystem: ruby
+    cve: "CVE-2024-28103"
+    severity: high
+    affected: "<7.1.3.2"
+    description: "Rails: DoS via crafted HTTP requests"
+    fixed: ">=7.1.3.2"
+
+  - package: nokogiri
+    ecosystem: ruby
+    cve: "CVE-2024-25062"
+    severity: high
+    affected: "<1.16.3"
+    description: "Nokogiri: XXE via crafted XML input"
+    fixed: ">=1.16.3"
+
+  - package: rack
+    ecosystem: ruby
+    cve: "CVE-2024-26146"
+    severity: high
+    affected: "<3.0.9.1"
+    description: "Rack: Header injection via crafted Content-Type"
+    fixed: ">=3.0.9.1"
+
+  - package: activesupport
+    ecosystem: ruby
+    cve: "CVE-2024-26143"
+    severity: medium
+    affected: "<7.1.3.1"
+    description: "Active Support: Weak sanitization in strip_tags"
+    fixed: ">=7.1.3.1"
+
+  - package: devise
+    ecosystem: ruby
+    cve: "CVE-2024-26140"
+    severity: medium
+    affected: "<4.9.3"
+    description: "Devise: Timing attack on password reset tokens"
+    fixed: ">=4.9.3"
+
+  # NuGet (.NET)
+  - package: Newtonsoft.Json
+    ecosystem: nuget
+    cve: "CVE-2024-21907"
+    severity: high
+    affected: "<13.0.2"
+    description: "Newtonsoft.Json: Denial of service via deep nesting"
+    fixed: ">=13.0.2"
+
+  - package: Microsoft.AspNetCore.App
+    ecosystem: nuget
+    cve: "CVE-2024-21319"
+    severity: medium
+    affected: "<8.0.1"
+    description: "ASP.NET Core: Timing attack on identity tokens"
+    fixed: ">=8.0.1"
+
+  - package: Microsoft.Identity.Client
+    ecosystem: nuget
+    cve: "CVE-2024-24572"
+    severity: high
+    affected: "<4.59.0"
+    description: "MSAL: Authentication bypass via redirect URI"
+    fixed: ">=4.59.0"
+
+  - package: System.Net.Http
+    ecosystem: nuget
+    cve: "CVE-2023-44487"
+    severity: high
+    affected: ">=4.0.0,<7.0.0"
+    description: "HttpClient: DoS via multiple futures"
+    fixed: ">=7.0.0"
+
+  - package: Microsoft.Data.SqlClient
+    ecosystem: nuget
+    cve: "CVE-2024-0056"
+    severity: medium
+    affected: "<5.1.5"
+    description: "SqlClient: Timing attack on SQL queries"
+    fixed: ">=5.1.5"

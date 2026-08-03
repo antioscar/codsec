@@ -1,0 +1,25 @@
+id: DESER-001
+category: insecure_deserialization
+severity: high
+cwe: "CWE-502"
+description_template: "Deserialización de datos no confiables detectada"
+remediation: |
+  1. No deserialices datos que provengan de fuentes no confiables (usuarios, red).
+  2. Python: evita `pickle.loads()` con datos externos. Usa JSON para serialización segura.
+  3. JS: ten cuidado con `JSON.parse()` cuando los datos no están validados; no uses `eval()`.
+  4. PHP: evita `unserialize()` con datos de usuario. Usa JSON.
+  5. Java: usa whitelists de clases con `ObjectInputStream`, o evita la deserialización de Java nativo.
+  6. Prefiere formatos de datos seguros como JSON, Protocol Buffers, o MessagePack.
+
+languages: [python, javascript, typescript, php, java, go, csharp, ruby]
+
+ast_node_types: []
+
+ast_function_names: []
+
+regex_patterns:
+  - '(?i)pickle\.loads?\s*\('
+  - '(?i)yaml\.load\s*\([^)]*[^s][^a][^f][^e]\)'
+  - '(?i)unserialize\s*\('
+  - '(?i)ObjectInputStream'
+  - '(?i)new\s+ObjectInputStream\s*\('

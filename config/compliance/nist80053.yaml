@@ -1,0 +1,102 @@
+# Mapping de categorías SAST → NIST SP 800-53 Rev 5 Security Controls
+nist80053_controls:
+  SI-10:
+    title: "Information Input Validation"
+    family: "System and Information Integrity"
+    description: "Check the validity of information inputs."
+    categories:
+      - sql_injection
+      - xss
+      - command_injection
+      - path_traversal
+      - ssti
+      - ldap_injection
+      - xxe
+      - open_redirect
+  SC-13:
+    title: "Cryptographic Protection"
+    family: "System and Communications Protection"
+    description: "Implement cryptographic mechanisms to protect confidentiality and integrity."
+    categories:
+      - insecure_crypto
+      - weak_hash
+  SC-7:
+    title: "Boundary Protection"
+    family: "System and Communications Protection"
+    description: "Monitor and control communications at external boundaries."
+    categories:
+      - ssrf
+  CM-6:
+    title: "Configuration Settings"
+    family: "Configuration Management"
+    description: "Establish and document mandatory configuration settings."
+    categories:
+      - security_headers
+      - hardcoded_secrets
+  SI-11:
+    title: "Error Handling"
+    family: "System and Information Integrity"
+    description: "Generate error messages that provide information necessary for corrective actions without revealing sensitive information."
+    categories:
+      - info_disclosure
+  SA-11:
+    title: "Developer Testing and Evaluation"
+    family: "System and Services Acquisition"
+    description: "Require developers to create and implement a security test and evaluation plan."
+    categories:
+      - sql_injection
+      - xss
+      - command_injection
+      - path_traversal
+      - insecure_crypto
+      - weak_hash
+      - ssti
+      - xxe
+      - ldap_injection
+      - prototype_pollution
+      - log_injection
+      - zip_slip
+      - vulnerable_dependency
+  SA-15:
+    title: "Development Process, Standards, and Tools"
+    family: "System and Services Acquisition"
+    description: "Require developers to follow documented development processes."
+    categories:
+      - insecure_deserialization
+  AU-9:
+    title: "Protection of Audit Information"
+    family: "Audit and Accountability"
+    description: "Protect audit information and audit logging tools from unauthorized access."
+    categories:
+      - log_injection
+  IA-5:
+    title: "Authenticator Management"
+    family: "Identification and Authentication"
+    description: "Manage system authenticators."
+    categories:
+      - weak_hash
+      - hardcoded_secrets
+  AC-6:
+    title: "Least Privilege"
+    family: "Access Control"
+    description: "Employ the principle of least privilege."
+    categories:
+      - path_traversal
+  CM-8:
+    title: "System Component Inventory"
+    family: "Configuration Management"
+    description: "Develop and document an inventory of system components."
+    categories:
+      - vulnerable_dependency
+  SA-22:
+    title: "Unsupported System Components"
+    family: "System and Services Acquisition"
+    description: "Replace unsupported system components."
+    categories:
+      - vulnerable_dependency
+  SI-5:
+    title: "Security Alerts, Advisories, and Directives"
+    family: "System and Information Integrity"
+    description: "Receive and respond to security alerts and advisories."
+    categories:
+      - vulnerable_dependency

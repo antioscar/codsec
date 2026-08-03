@@ -1,0 +1,28 @@
+id: CMD-001
+category: command_injection
+severity: critical
+cwe: "CWE-78"
+description_template: "Posible command injection: ejecución de comandos del sistema con datos de usuario sin sanitizar"
+remediation: |
+  1. Evita ejecutar comandos del sistema con input de usuario.
+  2. Si es inevitable, usa listas de argumentos en vez de strings (ej: `subprocess.run(['cmd', arg])` en vez de `os.system(f'cmd {arg}')`).
+  3. JS: evita `child_process.exec()` con input de usuario. Usa `execFile()` con argumentos como array.
+  4. PHP: evita `exec()`, `system()`, `passthru()`, `shell_exec()` con input de usuario. Usa `escapeshellarg()`.
+  5. Java: evita `Runtime.exec()` con strings concatenados.
+
+languages: [python, javascript, typescript, php, java, go, csharp, ruby]
+
+ast_node_types: []
+
+ast_function_names:
+  - system
+  - popen
+  - call
+  - run
+
+regex_patterns:
+  - '(?i)(os\.system|subprocess\.(call|Popen|run|check_output|check_call))\s*\(.*\+'
+  - '(?i)child_process\.exec\s*\('
+  - '(?i)(exec|system|shell_exec|passthru)\s*\(\s*.*\$'
+  - '(?i)Runtime\.getRuntime\(\)\.exec\s*\('
+  - '(?i)\.(call|run)\s*\(\s*["\x27].*\{'

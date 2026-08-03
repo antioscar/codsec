@@ -1,0 +1,32 @@
+id: INFO-001
+category: info_disclosure
+severity: medium
+cwe: "CWE-209"
+description_template: "Posible exposición de información sensible en la aplicación"
+remediation: |
+  1. No muestres stack traces ni mensajes de error detallados al usuario final.
+  2. Configurá páginas de error personalizadas (404, 500) sin información del sistema.
+  3. Django: `DEBUG = False` en producción, configura `ALLOWED_HOSTS`.
+  4. Flask: no uses `app.run(debug=True)` en producción.
+  5. Express: usa middleware de error que no exponga el stack trace con `NODE_ENV=production`.
+  6. Spring: configura `server.error.include-stacktrace=never` en application.properties.
+  7. No expongas `print()` o `console.log()` con datos sensibles (passwords, tokens, datos de usuario).
+  8. Deshabilitá el modo debug en todos los entornos de producción.
+
+languages: [python, javascript, typescript, php, java, go, csharp, ruby]
+
+ast_node_types: []
+
+ast_function_names: []
+
+regex_patterns:
+  - '(?i)app\.run\s*\(\s*debug\s*=\s*True'
+  - '(?i)flask\s*.*debug\s*=\s*True'
+  - '(?i)NODE_ENV\s*=\s*[\x27"]development[\x27"]'
+  - '(?i)console\.(log|error|warn)\s*\(\s*.*(password|token|secret|key|credential)'
+  - '(?i)print\s*\(\s*.*(password|token|secret|key|credential)'
+  - '(?i)(var_dump|print_r|echo)\s*\(\s*.*\$_(GET|POST|SESSION)'
+  - '(?i)printStackTrace\s*\('
+  - '(?i)e\.printStackTrace\s*\('
+  - '(?i)server\.error\.include-stacktrace\s*=\s*always'
+  - '(?i)logging\.level\..*\s*=\s*DEBUG'

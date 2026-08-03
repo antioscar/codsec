@@ -1,0 +1,35 @@
+id: HEADER-001
+category: security_headers
+severity: medium
+cwe: "CWE-693"
+description_template: "Posible ausencia de headers de seguridad en la aplicación"
+remediation: |
+  1. Content-Security-Policy (CSP): define fuentes permitidas para scripts, estilos, imágenes y otros recursos.
+  2. Strict-Transport-Security (HSTS): fuerza HTTPS en todas las conexiones (`max-age`, `includeSubDomains`, `preload`).
+  3. X-Frame-Options: `DENY` o `SAMEORIGIN` para prevenir clickjacking.
+  4. X-Content-Type-Options: `nosniff` para evitar MIME type sniffing.
+  5. Referrer-Policy: `strict-origin-when-cross-origin` o `no-referrer`.
+  6. Permissions-Policy: restringe APIs del navegador (cámara, micrófono, geolocalización).
+  7. Configurá estos headers en el servidor web (nginx, apache) o en el middleware de la aplicación.
+  8. Django: `SECURE_HSTS_SECONDS`, `SECURE_CONTENT_TYPE_NOSNIFF`, etc. en settings.py.
+  9. Express: usa `helmet` middleware.
+  10. Spring: `SecurityHeadersConfig` o `headers()` en SecurityConfig.
+
+languages: [python, javascript, typescript, php, java, go, csharp, ruby]
+
+ast_node_types: []
+
+ast_function_names: []
+
+regex_patterns:
+  - '(?i)SECURE_HSTS_SECONDS\s*=\s*0'
+  - '(?i)SECURE_SSL_REDIRECT\s*=\s*False'
+  - '(?i)SECURE_CONTENT_TYPE_NOSNIFF\s*=\s*False'
+  - '(?i)SECURE_BROWSER_XSS_FILTER\s*=\s*False'
+  - '(?i)X_FRAME_OPTIONS\s*=\s*[\x27"]?(ALLOW|SAMEORIGIN|NONE)'
+  - '(?i)app\.disable\s*\(\s*[\x27"]x-powered-by[\x27"]'
+  - '(?i)\.csrf\(\)\.disable\s*\('
+  - '(?i)\.headers\(\)\.disable\s*\('
+  - '(?i)DEBUG\s*=\s*True'
+  - '(?i)APP_DEBUG\s*=\s*true'
+  - '(?i)APP_ENV\s*=\s*[\x27"]development[\x27"]'

@@ -1,0 +1,87 @@
+# Mapping de categorías SAST → ISO/IEC 27034 Application Security Controls
+iso27034_controls:
+  ASC_INPUT_VALIDATION:
+    component: "Input Validation"
+    description: "Validate all input from untrusted sources before processing."
+    categories:
+      - sql_injection
+      - xss
+      - command_injection
+      - path_traversal
+      - ssti
+      - xxe
+      - ldap_injection
+      - log_injection
+      - open_redirect
+  ASC_OUTPUT_ENCODING:
+    component: "Output Encoding and Escaping"
+    description: "Apply output encoding appropriate to the rendering context."
+    categories:
+      - xss
+  ASC_AUTHENTICATION:
+    component: "Authentication"
+    description: "Verify identity of users, services, or devices."
+    categories:
+      - weak_hash
+  ASC_ACCESS_CONTROL:
+    component: "Access Control"
+    description: "Restrict access to functionality and data."
+    categories:
+      - path_traversal
+      - csrf
+      - prototype_pollution
+  ASC_CRYPTOGRAPHY:
+    component: "Cryptography"
+    description: "Protect data confidentiality and integrity with appropriate cryptography."
+    categories:
+      - insecure_crypto
+      - weak_hash
+      - hardcoded_secrets
+  ASC_ERROR_HANDLING:
+    component: "Error Handling and Logging"
+    description: "Handle errors gracefully without disclosing sensitive information."
+    categories:
+      - info_disclosure
+      - log_injection
+  ASC_DATA_PROTECTION:
+    component: "Data Protection"
+    description: "Protect sensitive data at rest and in transit."
+    categories:
+      - hardcoded_secrets
+      - info_disclosure
+      - insecure_crypto
+  ASC_COMMUNICATION:
+    component: "Communication Security"
+    description: "Secure network communications."
+    categories:
+      - ssrf
+  ASC_FILE_HANDLING:
+    component: "File and Resource Handling"
+    description: "Handle files and external resources safely."
+    categories:
+      - path_traversal
+      - zip_slip
+      - xxe
+  ASC_CONFIGURATION:
+    component: "Configuration Management"
+    description: "Apply secure configuration defaults."
+    categories:
+      - security_headers
+      - hardcoded_secrets
+  ASC_SESSION_MANAGEMENT:
+    component: "Session Management"
+    description: "Manage user sessions securely."
+    categories:
+      - csrf
+  ASC_MALICIOUS_CODE:
+    component: "Malicious Code Protection"
+    description: "Prevent execution of untrusted code."
+    categories:
+      - dynamic_exec
+      - insecure_deserialization
+      - ssti
+  ASC_DEPENDENCY_MANAGEMENT:
+    component: "Dependency and Supply Chain"
+    description: "Manage third-party components and their vulnerabilities."
+    categories:
+      - vulnerable_dependency

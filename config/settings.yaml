@@ -1,0 +1,56 @@
+exclude_dirs:
+  - node_modules
+  - .git
+  - dist
+  - build
+  - vendor
+  - __pycache__
+  - .next
+  - venv
+  - .venv
+  - .idea
+  - .vscode
+  - target
+  - out
+  - .angular
+  - coverage
+  - .nyc_output
+  - .tox
+  - .eggs
+  - .mypy_cache
+  - .pytest_cache
+  - .terraform
+
+exclude_files:
+  - package-lock.json
+  - yarn.lock
+  - pnpm-lock.yaml
+  - composer.lock
+  - poetry.lock
+  - Pipfile.lock
+
+min_severity: low
+
+max_workers: 4
+
+enabled_rules:
+  - sql_injection
+  - xss
+  - command_injection
+  - hardcoded_secrets
+  - path_traversal
+  - ssrf
+  - insecure_crypto
+  - insecure_deserialization
+  - dynamic_exec
+  - open_redirect
+  - csrf
+  - security_headers
+  - info_disclosure
+  - ssti
+  - xxe
+  - ldap_injection
+  - prototype_pollution
+  - log_injection
+  - zip_slip
+  - weak_hash

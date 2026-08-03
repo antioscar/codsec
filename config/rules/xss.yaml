@@ -1,0 +1,29 @@
+id: XSS-001
+category: xss
+severity: high
+cwe: "CWE-79"
+description_template: "Posible XSS (Cross-Site Scripting) detectada: renderizado de contenido no sanitizado en el DOM"
+remediation: |
+  1. Escapa siempre el contenido antes de insertarlo en el DOM.
+  2. JS: no uses `innerHTML` / `dangerouslySetInnerHTML` con datos de usuario. Usa `textContent` o sanitización con DOMPurify.
+  3. React: evita `dangerouslySetInnerHTML` a menos que sanitices con DOMPurify.
+  4. Python templates: usa autoescape (Django, Jinja2).
+  5. PHP: usa `htmlspecialchars()` al renderizar en HTML.
+  6. Valida y sanitiza cualquier input de usuario antes de mostrarlo.
+
+languages: [python, javascript, typescript, php, java, go, csharp, ruby]
+
+ast_node_types: []
+
+ast_function_names: []
+
+regex_patterns:
+  - '\.innerHTML\s*='
+  - 'dangerouslySetInnerHTML'
+  - 'v-html='
+  - '(?i)document\.write\s*\('
+  - '(?i)\.insertAdjacentHTML\s*\('
+  - '(?i)eval\s*\(\s*.*\+'
+  - '(?i)render\s*\(\s*.*request\.(GET|POST|args)'
+  - '(?i)echo\s+.*\$_(GET|POST|REQUEST)'
+  - '(?i)print\s+.*request\.(GET|POST|args)'

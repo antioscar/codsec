@@ -1,0 +1,113 @@
+# Mapping de categorías SAST → ISO/IEC 27001:2022 Anexo A
+iso27001_controls:
+  A.8.9:
+    title: "Gestión de la configuración"
+    description: "Las configuraciones de seguridad deben documentarse y gestionarse formalmente."
+    categories:
+      - hardcoded_secrets
+      - security_headers
+  A.8.12:
+    title: "Prevención de fuga de datos"
+    description: "Aplicar medidas para prevenir la divulgación no autorizada de información."
+    categories:
+      - info_disclosure
+      - log_injection
+  A.8.24:
+    title: "Uso de criptografía"
+    description: "Establecer reglas para el uso efectivo de criptografía, incluyendo gestión de claves."
+    categories:
+      - insecure_crypto
+      - weak_hash
+  A.8.25:
+    title: "Ciclo de vida de desarrollo seguro"
+    description: "Establecer y aplicar reglas para el desarrollo seguro de software y sistemas."
+    categories:
+      - insecure_deserialization
+      - vulnerable_dependency
+  A.8.26:
+    title: "Requisitos de seguridad de aplicaciones"
+    description: "Identificar, especificar y aprobar requisitos de seguridad en el desarrollo."
+    categories:
+      - open_redirect
+      - csrf
+      - xss
+      - sql_injection
+      - info_disclosure
+  A.8.27:
+    title: "Arquitectura de sistemas y principios de ingeniería segura"
+    description: "Diseñar sistemas con principios de seguridad desde la arquitectura."
+    categories:
+      - ssrf
+  A.8.28:
+    title: "Codificación segura"
+    description: "Aplicar principios de codificación segura para prevenir vulnerabilidades."
+    categories:
+      - sql_injection
+      - xss
+      - command_injection
+      - path_traversal
+      - hardcoded_secrets
+      - insecure_crypto
+      - insecure_deserialization
+      - dynamic_exec
+      - open_redirect
+      - csrf
+      - security_headers
+      - ssrf
+      - ssti
+      - xxe
+      - ldap_injection
+      - prototype_pollution
+      - log_injection
+      - zip_slip
+      - weak_hash
+      - vulnerable_dependency
+  A.8.29:
+    title: "Pruebas de seguridad en desarrollo y aceptación"
+    description: "Realizar pruebas de seguridad durante el ciclo de vida del desarrollo."
+    categories:
+      - sql_injection
+      - xss
+      - command_injection
+      - path_traversal
+      - ssrf
+      - ssti
+      - xxe
+      - ldap_injection
+      - prototype_pollution
+      - log_injection
+      - zip_slip
+      - weak_hash
+      - vulnerable_dependency
+
+owasp_top10_2021:
+  A01:
+    title: "Broken Access Control"
+    categories: [path_traversal]
+  A02:
+    title: "Cryptographic Failures"
+    categories: [insecure_crypto, weak_hash, hardcoded_secrets]
+  A03:
+    title: "Injection"
+    categories: [sql_injection, xss, command_injection, ldap_injection, log_injection, ssti]
+  A04:
+    title: "Insecure Design"
+    categories: [prototype_pollution]
+  A05:
+    title: "Security Misconfiguration"
+    categories: [security_headers, xxe, zip_slip]
+  A06:
+    title: "Vulnerable and Outdated Components"
+    categories: [vulnerable_dependency]
+  A07:
+    title: "Identification and Authentication Failures"
+    categories: [weak_hash]
+  A08:
+    title: "Software and Data Integrity Failures"
+    categories: [insecure_deserialization]
+  A09:
+    title: "Security Logging and Monitoring Failures"
+    categories: [log_injection]
+  A10:
+    title: "Server-Side Request Forgery (SSRF)"
+    categories: [ssrf]

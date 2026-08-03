@@ -1,0 +1,5 @@
+#!/bin/bash
+# Analizador de Seguridad de Código — pre-commit hook
+# Copiar a .git/hooks/pre-commit para usarlo
+
+python main.py -p . --fail-on high --no-llm
