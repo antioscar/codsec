@@ -32,11 +32,16 @@ jobs:
           coverage run -m pytest tests/ -v --tb=short
           coverage report --include="src/*" --fail-under=75
 
-      - name: Self-scan (analyzer on itself)
-        if: matrix.os == 'windows-latest'
+      - name: Self-scan with SARIF (analyzer on itself)
         run: |
-          python main.py -p src --lang python --no-llm --fail-on none
+          python main.py -p src --no-llm --fail-on none --sarif codsec-results.sarif
         continue-on-error: true
+
+      - name: Upload SARIF to GitHub Code Scanning
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: codsec-results.sarif
+          category: codsec-self-scan
 
       - name: Build exe (Windows)
         if: matrix.os == 'windows-latest'
