@@ -1,4 +1,5 @@
 from __future__ import annotations
+import os
 import re
 from pathlib import Path
 from typing import Optional
@@ -371,6 +372,10 @@ def run_taint_analysis(parsed: ParsedFile, rules: list[Rule]) -> list[Finding]:
                 context_end = min(len(parsed.lines), line_idx + 2)
                 snippet = "\n".join(parsed.lines[context_start:context_end]).strip()
 
+                confidence = "high"
+                if "/test/" in parsed.path or "/tests/" in parsed.path or os.path.basename(parsed.path).startswith("test_"):
+                    confidence = "medium"
+
                 findings.append(Finding(
                     id=f"TAINT-{category[:4].upper()}",
                     category=category,
@@ -382,7 +387,7 @@ def run_taint_analysis(parsed: ParsedFile, rules: list[Rule]) -> list[Finding]:
                     code_snippet=snippet,
                     description=description,
                     remediation=remediation,
-                    confidence="high",
+                    confidence=confidence,
                 ))
 
     return findings

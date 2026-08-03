@@ -57,3 +57,8 @@ enabled_rules:
   - cors_misconfiguration
   - cookie_security
   - insecure_jwt
+  - nosql_injection
+  - insecure_random
+  - idor_access_control
+  - unsafe_deserialization_advanced
+  - http_parameter_pollution

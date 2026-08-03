@@ -205,7 +205,9 @@ def test_load_all_rules_count():
                 "path_traversal", "ssrf", "insecure_crypto", "insecure_deserialization",
                 "dynamic_exec", "open_redirect", "csrf", "security_headers", "info_disclosure",
                 "ssti", "xxe", "ldap_injection", "prototype_pollution", "log_injection",
-                "zip_slip", "weak_hash", "cors_misconfiguration", "cookie_security", "insecure_jwt"}
+                "zip_slip", "weak_hash", "cors_misconfiguration", "cookie_security", "insecure_jwt",
+                "nosql_injection", "insecure_random", "idor_access_control",
+                "unsafe_deserialization_advanced", "http_parameter_pollution"}
     assert categories == expected
 
 

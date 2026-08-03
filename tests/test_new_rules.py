@@ -200,3 +200,106 @@ def test_insecure_jwt_weak_secret():
         findings = analyze_file(file_path, "python", rules)
         jwt_findings = [f for f in findings if f.category == "insecure_jwt"]
         assert len(jwt_findings) >= 1, f"Expected insecure_jwt finding, got {[f.category for f in findings]}"
+
+
+def test_nosql_injection_javascript():
+    with tempfile.TemporaryDirectory() as tmp:
+        file_path = str(Path(tmp, "app.js"))
+        Path(file_path).write_text(
+            'app.post("/user", (req, res) => {\n'
+            '    const user = db.collection("users").find({ $where: req.body.query });\n'
+            '    res.json(user);\n'
+            '});\n'
+        )
+        rules = load_rules()
+        findings = analyze_file(file_path, "javascript", rules)
+        nosql = [f for f in findings if f.category == "nosql_injection"]
+        assert len(nosql) >= 1, f"Expected nosql_injection finding, got {[f.category for f in findings]}"
+
+
+def test_nosql_injection_python():
+    with tempfile.TemporaryDirectory() as tmp:
+        file_path = str(Path(tmp, "app.py"))
+        Path(file_path).write_text(
+            'from flask import Flask, request\n'
+            'app = Flask(__name__)\n'
+            '@app.route("/search")\n'
+            'def search():\n'
+            '    q = request.args.get("q")\n'
+            '    return db.users.find({"name": {"$gt": q}})\n'
+        )
+        rules = load_rules()
+        findings = analyze_file(file_path, "python", rules)
+        nosql = [f for f in findings if f.category == "nosql_injection"]
+        assert len(nosql) >= 1, f"Expected nosql_injection finding, got {[f.category for f in findings]}"
+
+
+def test_insecure_random_javascript():
+    with tempfile.TemporaryDirectory() as tmp:
+        file_path = str(Path(tmp, "app.js"))
+        Path(file_path).write_text(
+            'function generateToken() {\n'
+            '    return Math.random().toString(36);\n'
+            '}\n'
+        )
+        rules = load_rules()
+        findings = analyze_file(file_path, "javascript", rules)
+        rand = [f for f in findings if f.category == "insecure_random"]
+        assert len(rand) >= 1, f"Expected insecure_random finding, got {[f.category for f in findings]}"
+
+
+def test_insecure_random_python():
+    with tempfile.TemporaryDirectory() as tmp:
+        file_path = str(Path(tmp, "app.py"))
+        Path(file_path).write_text(
+            'import random\n'
+            'token = str(random.randint(1000, 9999))\n'
+        )
+        rules = load_rules()
+        findings = analyze_file(file_path, "python", rules)
+        rand = [f for f in findings if f.category == "insecure_random"]
+        assert len(rand) >= 1, f"Expected insecure_random finding, got {[f.category for f in findings]}"
+
+
+def test_idor_access_control_javascript():
+    with tempfile.TemporaryDirectory() as tmp:
+        file_path = str(Path(tmp, "app.js"))
+        Path(file_path).write_text(
+            'router.get("/user/info", (req, res) => {\n'
+            '    db.findOne({ _id: req.params.id });\n'
+            '    res.send("ok");\n'
+            '});\n'
+        )
+        rules = load_rules()
+        findings = analyze_file(file_path, "javascript", rules)
+        idor = [f for f in findings if f.category == "idor_access_control"]
+        assert len(idor) >= 1, f"Expected idor_access_control finding, got {[f.category for f in findings]}"
+
+
+def test_unsafe_deserialization_advanced_python():
+    with tempfile.TemporaryDirectory() as tmp:
+        file_path = str(Path(tmp, "app.py"))
+        Path(file_path).write_text(
+            'import yaml\n'
+            'def parse(data):\n'
+            '    return yaml.unsafe_load(data)\n'
+        )
+        rules = load_rules()
+        findings = analyze_file(file_path, "python", rules)
+        deser = [f for f in findings if f.category == "unsafe_deserialization_advanced"]
+        assert len(deser) >= 1, f"Expected unsafe_deserialization_advanced finding, got {[f.category for f in findings]}"
+
+
+def test_http_parameter_pollution_javascript():
+    with tempfile.TemporaryDirectory() as tmp:
+        file_path = str(Path(tmp, "app.js"))
+        Path(file_path).write_text(
+            'app.get("/search", (req, res) => {\n'
+            '    const page = parseInt(req.query.page);\n'
+            '    res.send("ok");\n'
+            '});\n'
+        )
+        rules = load_rules()
+        findings = analyze_file(file_path, "javascript", rules)
+        hpp = [f for f in findings if f.category == "http_parameter_pollution"]
+        assert len(hpp) >= 1, f"Expected http_parameter_pollution finding, got {[f.category for f in findings]}"

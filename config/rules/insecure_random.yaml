@@ -1,0 +1,33 @@
+id: RAND-001
+category: insecure_random
+severity: high
+cwe: "CWE-338"
+description_template: "Uso de generador de números aleatorios no criptográfico para fines de seguridad"
+remediation: |
+  1. No uses generadores PRNG (Math.random, rand(), mt_rand) para seguridad.
+  2. Python: usa secrets.token_hex(), secrets.choice() del módulo secrets.
+  3. JS/TS: usa crypto.randomBytes(), crypto.randomUUID().
+  4. Java: usa SecureRandom en lugar de Random.
+  5. Go: usa crypto/rand en lugar de math/rand.
+  6. C#: usa System.Security.Cryptography.RandomNumberGenerator.
+  7. PHP: usa random_bytes() o random_int() en lugar de rand() o mt_rand().
+
+languages: [python, javascript, typescript, php, java, go, csharp, ruby, kotlin, swift, rust]
+
+ast_node_types: []
+
+ast_function_names:
+  - random
+  - randint
+  - nextInt
+  - rand
+
+regex_patterns:
+  - '(?i)(random\.(random|randint|choice|randrange)|numpy\.random)\s*\('
+  - '(?i)Math\.random\s*\(\s*\)'
+  - '(?i)new\s+Random\s*\(\s*\)(?!.*Secure)'
+  - '(?i)mt_rand\s*\(\s*'
+  - '(?i)(rand|srand)\s*\(\s*'
+  - '(?i)rand::random\s*\(\s*\)(?!.*CryptoRng)'
+  - '(?i)System\.Random\s*\(\s*\)(?!.*Cryptographic)'
+  - '(?i)\.Next\s*\(\s*\)(?!.*RandomNumberGenerator)'

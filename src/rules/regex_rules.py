@@ -1,4 +1,5 @@
 from __future__ import annotations
+import os
 import re
 from src.models import Rule, Finding, Severity
 
@@ -40,6 +41,24 @@ def apply_regex_rule(
 
             line_number = source_text[: match.start()].count("\n") + 1
             line_idx = line_number - 1
+            line_text = lines[line_idx] if line_idx < len(lines) else ""
+
+            if rule.category in ("hardcoded_secrets", "info_disclosure"):
+                if "/test/" in file_path or os.path.basename(file_path).startswith("test_"):
+                    continue
+
+            stripped_line = line_text.strip()
+            if stripped_line.startswith(("#", "//", "/*", "*")) or "*/" in stripped_line:
+                continue
+
+            _filename = os.path.basename(file_path).lower()
+            if _filename.endswith((".json", ".yaml", ".yml", ".toml", ".ini", ".cfg", ".env")):
+                if rule.category not in ("sql_injection", "command_injection", "xss"):
+                    continue
+
+            placeholders = ('= "password"', '= "test"', '= "changeme"', '= "admin"')
+            if any(p in line_text for p in placeholders):
+                continue
 
             context_start = max(0, line_idx - 1)
             context_end = min(len(lines), line_idx + 2)

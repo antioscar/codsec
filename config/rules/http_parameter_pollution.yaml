@@ -1,0 +1,26 @@
+id: HPP-001
+category: http_parameter_pollution
+severity: medium
+cwe: "CWE-235"
+description_template: "Posible HTTP Parameter Pollution: uso de parámetros HTTP sin validar el tipo o array"
+remediation: |
+  1. Validá que los parámetros HTTP sean del tipo esperado (string, int, etc.).
+  2. No uses directamente parámetros que pueden ser arrays o strings múltiples.
+  3. Python/Flask: usa request.args.get('param', type=str) con type definido.
+  4. JS/Express: usa req.query.param o req.query.param[0] según esperes string único.
+  5. PHP: usá filter_var() o is_array() para validar el tipo antes de usar.
+  6. Java: usá @RequestParam con required=true y tipo específico.
+
+languages: [python, javascript, typescript, php, java, go, csharp, ruby, kotlin, swift, rust]
+
+ast_node_types: []
+
+ast_function_names: []
+
+regex_patterns:
+  - '(?i)request\.(GET|POST|args|query|params)\.get\s*\(\s*[\x27"]\w+[\x27"](?!.*,.*type\s*=)'
+  - '(?i)\$_(GET|POST|REQUEST)\s*\[[\x27"]\w+[\x27"]\](?!.*is_array\s*\(|filter_var)'
+  - '(?i)req\.(params|query|body)\.\w+\s*\((?!.*first\(|.*\[0\]|.*single)'
+  - '(?i)parseInt\s*\(\s*req\.query\.\w+'
+  - '(?i)\.getParameter\s*\(\s*[\x27"]\w+[\x27"]\s*\)(?!.*\[\d+\])'
+  - '(?i)r\.FormValue\s*\(\s*[\x27"]\w+[\x27"]\s*\)'

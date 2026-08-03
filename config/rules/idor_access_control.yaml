@@ -1,0 +1,27 @@
+id: IDOR-001
+category: idor_access_control
+severity: high
+cwe: "CWE-639"
+description_template: "Posible IDOR / falta de control de acceso: endpoint accede a recursos sin verificar propiedad/autorización"
+remediation: |
+  1. Verificá que el usuario autenticado tenga permiso para acceder al recurso.
+  2. No uses IDs predecibles (auto-incrementales) para recursos sensibles.
+  3. Usa UUIDs o slugs no secuenciales.
+  4. Implementa verificación de propiedad: `if resource.owner != request.user: return 403`.
+  5. Django: usa `request.user` y `@login_required` + verificación de propiedad.
+  6. Spring: usa `@PreAuthorize` o `@PostAuthorize` para restringir acceso.
+  7. Express: implementa middleware de autorización antes de la lógica de negocio.
+
+languages: [python, javascript, typescript, php, java, go, csharp, ruby, kotlin, swift, rust]
+
+ast_node_types: []
+
+ast_function_names: []
+
+regex_patterns:
+  - '(?i)def\s+\w+\s*\(\s*(self|cls)?\s*,?\s*request\s*\):\s*\n\s*(?!.*\b(request\.user|permission|auth|login_required|@login_required))'
+  - '(?i)app\.(get|post|put|delete|patch)\s*\(\s*[\x27"][^(\x27")]+/(\w+|<[^>]+>)(?!.*@login_required|@auth|middleware)'
+  - '(?i)@(Get|Post|Put|Delete|Patch)Mapping.*(?!.*@PreAuthorize|@Secured|@RolesAllowed)'
+  - '(?i)(router|route)\.(get|post|put|delete)\s*\([\x27"][^(\x27")]+/(\w+)(?!.*auth|verify|middleware)'
+  - '(?i)(findOne|findById|find_by_id|\.get\s*\()\s*\{\s*.*_id\s*:\s*req\.(params|query|body)\.\w+(?!.*(\.user|\.owner|\.author))'
+  - '(?i)\.findOne\s*\(\s*\{\s*id\s*:\s*params\.id\s*\}(?!.*\.equals\(req\.user\.id\))'

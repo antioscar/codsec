@@ -1,0 +1,31 @@
+id: DESER-ADV-001
+category: unsafe_deserialization_advanced
+severity: critical
+cwe: "CWE-502"
+description_template: "Deserialización peligrosa detectada con bibliotecas vulnerables (pickle alternativas, torch, XStream)"
+remediation: |
+  1. No uses pickle, dill, cloudpickle, torch.load, o marshal con datos externos.
+  2. yaml.load → yaml.safe_load (PyYAML 5.1+).
+  3. jsonpickle no es seguro para datos externos.
+  4. XStream/fastjson configurados sin type safety son peligrosos.
+  5. Prefiere formatos seguros: JSON (con json.loads), Protobuf, o validación manual.
+  6. Usa listas blancas de clases si la deserialización es inevitable.
+
+languages: [python, javascript, typescript, php, java, go, csharp, ruby, kotlin, swift, rust]
+
+ast_node_types: []
+
+ast_function_names: []
+
+regex_patterns:
+  - '(?i)(ast\.literal_eval|yaml\.unsafe_load|yaml\.full_load|ruamel\.yaml\.load)\s*\('
+  - '(?i)jsonpickle\.(decode|loads)\s*\('
+  - '(?i)dill\.(loads|load)\s*\('
+  - '(?i)cloudpickle\.(loads|load)\s*\('
+  - '(?i)torch\.(load|save)\s*\(.*request\.(files|body|data)'
+  - '(?i)joblib\.(load|dump)\s*\(.*request\.(files|body|data)'
+  - '(?i)marshal\.(load|loads)\s*\('
+  - '(?i)\.decode\(.*\b(request\.(body|data)|req\.(body|raw)|input|params)'
+  - '(?i)XStream\s*\(\).*\.fromXML\s*\(.*request'
+  - '(?i)fastjson.*parseObject\s*\(.*request'
+  - '(?i)OIS\.loads\s*\(.*request'

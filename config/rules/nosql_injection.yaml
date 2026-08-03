@@ -1,0 +1,33 @@
+id: NOSQL-001
+category: nosql_injection
+severity: critical
+cwe: "CWE-943"
+description_template: "Posible NoSQL injection: consulta MongoDB/NoSQL construida con datos de usuario sin sanitizar"
+remediation: |
+  1. Usa consultas tipadas o esquemas en lugar de queries dinámicas.
+  2. Mongoose: usa .where() o .equals() para consultas por campos.
+  3. No uses operadores MongoDB ($where, $gt, $ne, etc.) con datos de usuario.
+  4. Sanitizá la entrada eliminando los caracteres $ y . de los campos de consulta.
+  5. Java: usa Criteria de Spring Data en lugar de queries raw.
+  6. PHP: usa el builder de MongoDB en lugar de arrays dinámicos.
+
+languages: [python, javascript, typescript, php, java, go, csharp, ruby, kotlin, swift, rust]
+
+ast_node_types: []
+
+ast_function_names:
+  - find
+  - findOne
+  - aggregate
+  - insertOne
+  - updateOne
+
+regex_patterns:
+  - '(?i)(\$where|\$gt|\$ne|\$regex)\s*:\s*.*\b(request|req|input|param|query|body)'
+  - '(?i)\.(find|findOne|findById)\s*\(\s*\{[^}]*\$\{.*\b(input|param|request)'
+  - '(?i)(find\{\s*.*\#\{).*\b(params|cookies|session|request)'
+  - '(?i)\.aggregate\s*\(\s*\[\s*\{[^}]*\$match[^}]*\$where'
+  - '(?i)\.(insertOne|insertMany|updateOne|updateMany|deleteOne|deleteMany)\s*\(.*\b(request\.(body|query|params)|req\.(body|query|params))'
+  - '(?i)rawCollection\s*\(\s*\)\s*\.(find|aggregate).*\b(request|req)'
+  - '(?i)mongoose\.model\s*\([^)]+\)\.find\s*\(\s*\{.*\+\s*.*\b(input|param|request)'
+  - '(?i)\$lookup\s*:\s*\{[^}]*from\s*:.*\+'

@@ -17,12 +17,15 @@ MANIFEST_PATTERNS = [
     "requirements.txt",
     "poetry.lock",
     "Pipfile.lock",
+    "Pipfile",
     "composer.lock",
     "composer.json",
     "pom.xml",
     "go.mod",
     "Gemfile.lock",
     "packages.config",
+    "Cargo.lock",
+    "Package.swift",
 ]
 CS_PROJ_PATTERN = re.compile(r"\.csproj$", re.IGNORECASE)
 
@@ -203,6 +206,32 @@ def scan_manifest(file_path: str) -> list[dict]:
         except (json.JSONDecodeError, OSError):
             pass
 
+    elif filename == "pipfile":
+        ecosystem = "pypi"
+        try:
+            with open(file_path, "r", encoding="utf-8", errors="replace") as f:
+                content = f.read()
+            in_packages = False
+            for line in content.split("\n"):
+                stripped = line.strip()
+                if not stripped or stripped.startswith("#"):
+                    continue
+                if stripped in ("[packages]", "[dev-packages]"):
+                    in_packages = True
+                    continue
+                if stripped.startswith("[") and stripped.endswith("]"):
+                    in_packages = False
+                    continue
+                if in_packages:
+                    m = re.match(r'^([A-Za-z0-9_\-\.]+)\s*=\s*(?:"==|==\s*"?)?([^"\']+)?', stripped)
+                    if m:
+                        ver = m.group(2).strip().strip('"').strip("'") if m.group(2) else "0.0.0"
+                        if ver == "*":
+                            ver = "0.0.0"
+                        results.extend(_check_pkg(m.group(1).lower(), _clean_version(ver), ecosystem, vulnerabilities))
+        except OSError:
+            pass
+
     elif filename in ("composer.json", "composer.lock"):
         ecosystem = "composer"
         try:
@@ -322,6 +351,36 @@ def scan_manifest(file_path: str) -> list[dict]:
                 content = f.read()
             for m in re.finditer(r'<PackageReference\s+Include="([^"]+)"[^>]*Version="([^"]+)"', content):
                 results.extend(_check_pkg(m.group(1), _clean_version(m.group(2)), ecosystem, vulnerabilities))
+        except OSError:
+            pass
+
+    elif filename == "cargo.lock":
+        ecosystem = "cargo"
+        try:
+            with open(file_path, "r", encoding="utf-8", errors="replace") as f:
+                content = f.read()
+            for block in re.split(r'\n\[\[package\]\]\n', content):
+                nm = re.search(r'^name\s*=\s*"([^"]+)"', block, re.MULTILINE)
+                vm = re.search(r'^version\s*=\s*"([^"]+)"', block, re.MULTILINE)
+                if nm and vm:
+                    results.extend(_check_pkg(nm.group(1), _clean_version(vm.group(1)), ecosystem, vulnerabilities))
+        except OSError:
+            pass
+
+    elif filename == "package.swift":
+        ecosystem = "swift"
+        try:
+            with open(file_path, "r", encoding="utf-8", errors="replace") as f:
+                content = f.read()
+            for m in re.finditer(r'\.package\s*\(\s*url\s*:\s*"([^"]+)"', content):
+                url = m.group(1)
+                pkg_name = url.rstrip("/").split("/")[-1]
+                if pkg_name.endswith(".git"):
+                    pkg_name = pkg_name[:-4]
+                remainder = content[m.end():m.end() + 300]
+                ver_match = re.search(r'(?:from\s*:\s*)?\s*"([^"]+)"', remainder)
+                ver = ver_match.group(1) if ver_match else "0.0.0"
+                results.extend(_check_pkg(pkg_name, _clean_version(ver), ecosystem, vulnerabilities))
         except OSError:
             pass
 
@@ -470,6 +529,30 @@ def scan_manifest_raw(file_path: str) -> list[tuple[str, str, str]]:
                         raw.append((pkg, _clean_version(info.get("version", "0.0.0")), "pypi"))
             except Exception:
                 pass
+        elif filename == "pipfile":
+            try:
+                with open(file_path, "r", encoding="utf-8", errors="replace") as f:
+                    content = f.read()
+                in_packages = False
+                for line in content.split("\n"):
+                    stripped = line.strip()
+                    if not stripped or stripped.startswith("#"):
+                        continue
+                    if stripped in ("[packages]", "[dev-packages]"):
+                        in_packages = True
+                        continue
+                    if stripped.startswith("[") and stripped.endswith("]"):
+                        in_packages = False
+                        continue
+                    if in_packages:
+                        m = re.match(r'^([A-Za-z0-9_\-\.]+)\s*=\s*(?:"==|==\s*"?)?([^"\']+)?', stripped)
+                        if m:
+                            ver = m.group(2).strip().strip('"').strip("'") if m.group(2) else "0.0.0"
+                            if ver == "*":
+                                ver = "0.0.0"
+                            raw.append((m.group(1).lower(), _clean_version(ver), "pypi"))
+            except Exception:
+                pass
         elif filename in ("composer.json", "composer.lock"):
             try:
                 with open(file_path, "r", encoding="utf-8", errors="replace") as f:
@@ -553,6 +636,32 @@ def scan_manifest_raw(file_path: str) -> list[tuple[str, str, str]]:
                     content = f.read()
                 for m in re.finditer(r'<PackageReference\s+Include="([^"]+)"[^>]*Version="([^"]+)"', content):
                     raw.append((m.group(1), _clean_version(m.group(2)), "nuget"))
+            except Exception:
+                pass
+        elif filename == "cargo.lock":
+            try:
+                with open(file_path, "r", encoding="utf-8", errors="replace") as f:
+                    content = f.read()
+                for block in re.split(r'\n\[\[package\]\]\n', content):
+                    nm = re.search(r'^name\s*=\s*"([^"]+)"', block, re.MULTILINE)
+                    vm = re.search(r'^version\s*=\s*"([^"]+)"', block, re.MULTILINE)
+                    if nm and vm:
+                        raw.append((nm.group(1), _clean_version(vm.group(1)), "cargo"))
+            except Exception:
+                pass
+        elif filename == "package.swift":
+            try:
+                with open(file_path, "r", encoding="utf-8", errors="replace") as f:
+                    content = f.read()
+                for m in re.finditer(r'\.package\s*\(\s*url\s*:\s*"([^"]+)"', content):
+                    url = m.group(1)
+                    pkg_name = url.rstrip("/").split("/")[-1]
+                    if pkg_name.endswith(".git"):
+                        pkg_name = pkg_name[:-4]
+                    remainder = content[m.end():m.end() + 300]
+                    ver_match = re.search(r'(?:from\s*:\s*)?\s*"([^"]+)"', remainder)
+                    ver = ver_match.group(1) if ver_match else "0.0.0"
+                    raw.append((pkg_name, _clean_version(ver), "swift"))
             except Exception:
                 pass
     except Exception:

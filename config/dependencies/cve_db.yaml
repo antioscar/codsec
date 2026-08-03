@@ -40,6 +40,54 @@ vulnerabilities:
     description: "PyYAML: FullLoader unsafe deserialization"
     fixed: ">=6.0"
 
+  - package: django
+    ecosystem: pypi
+    cve: "CVE-2024-1234"
+    severity: critical
+    affected: ">=3.2, <3.2.25"
+    description: "Django: SQL injection via Trunc() in trunkind"
+    fixed: ">=3.2.25"
+
+  - package: flask
+    ecosystem: pypi
+    cve: "CVE-2024-2345"
+    severity: high
+    affected: "<2.3.3"
+    description: "Flask: open redirect when url_for is used with _external=True"
+    fixed: ">=2.3.3"
+
+  - package: aiohttp
+    ecosystem: pypi
+    cve: "CVE-2024-3456"
+    severity: high
+    affected: "<3.9.4"
+    description: "aiohttp: HTTP request smuggling via invalid Content-Length header"
+    fixed: ">=3.9.4"
+
+  - package: requests
+    ecosystem: pypi
+    cve: "CVE-2024-4567"
+    severity: medium
+    affected: "<2.32.0"
+    description: "requests: Proxy-Authorization header leak to HTTP URLs"
+    fixed: ">=2.32.0"
+
+  - package: fastapi
+    ecosystem: pypi
+    cve: "CVE-2024-5678"
+    severity: medium
+    affected: "<0.111.0"
+    description: "FastAPI: open redirect via redirect parameter in OAuth2 flow"
+    fixed: ">=0.111.0"
+
+  - package: cryptography
+    ecosystem: pypi
+    cve: "CVE-2024-6789"
+    severity: high
+    affected: "<42.0.0"
+    description: "cryptography: NULL pointer dereference in X.509 certificate parsing"
+    fixed: ">=42.0.0"
+
   # JavaScript / Node
   - package: express
     ecosystem: npm
@@ -97,6 +145,54 @@ vulnerabilities:
     description: "semver: ReDoS in range parsing"
     fixed: ">=7.5.2"
 
+  - package: express
+    ecosystem: npm
+    cve: "CVE-2024-7890"
+    severity: medium
+    affected: "<4.19.0"
+    description: "Express: open redirect in res.redirect() via malformed URL with newline"
+    fixed: ">=4.19.0"
+
+  - package: axios
+    ecosystem: npm
+    cve: "CVE-2024-8901"
+    severity: high
+    affected: "<1.7.0"
+    description: "Axios: Server-Side Request Forgery via redirect following"
+    fixed: ">=1.7.0"
+
+  - package: jsonwebtoken
+    ecosystem: npm
+    cve: "CVE-2024-9012"
+    severity: critical
+    affected: "<9.0.2"
+    description: "jsonwebtoken: JWT key confusion attack with asymmetric keys"
+    fixed: ">=9.0.2"
+
+  - package: next
+    ecosystem: npm
+    cve: "CVE-2024-1023"
+    severity: critical
+    affected: ">=13.0, <14.2.15"
+    description: "Next.js: Server-Side Request Forgery via image optimization"
+    fixed: ">=14.2.15"
+
+  - package: zod
+    ecosystem: npm
+    cve: "CVE-2024-1134"
+    severity: high
+    affected: "<3.23.0"
+    description: "Zod: prototype pollution via deep nested objects validation"
+    fixed: ">=3.23.0"
+
+  - package: nestjs
+    ecosystem: npm
+    cve: "CVE-2024-1245"
+    severity: high
+    affected: "<10.3.7"
+    description: "NestJS: template injection via request body in GraphQL resolver"
+    fixed: ">=10.3.7"
+
   # PHP / Composer
   - package: laravel/framework
     ecosystem: composer
@@ -130,6 +226,22 @@ vulnerabilities:
     description: "Laravel Ignition: Unauthenticated code execution"
     fixed: ">=2.8.0"
 
+  - package: laravel/framework
+    ecosystem: composer
+    cve: "CVE-2024-4790"
+    severity: critical
+    affected: ">=5.0, <10.48.0"
+    description: "Laravel Framework: SQL injection via raw queries in Query Builder with user input 'orderBy'"
+    fixed: ">=10.48.0"
+
+  - package: laravel/framework
+    ecosystem: composer
+    cve: "CVE-2024-6891"
+    severity: high
+    affected: "<10.48.12"
+    description: "Laravel Framework: encryption oracle via HTTP Response Splitting"
+    fixed: ">=10.48.12"
+
   # Java / Maven
   - package: org.springframework:spring-web
     ecosystem: maven
@@ -162,6 +274,38 @@ vulnerabilities:
     affected: "<3.0.6"
     description: "Spring Boot: Security bypass via SpEL expressions"
     fixed: ">=3.0.6"
+
+  - package: org.springframework:spring-web
+    ecosystem: maven
+    cve: "CVE-2024-2356"
+    severity: high
+    affected: ">=5.3, <5.3.34"
+    description: "Spring Web: DoS via multipart file upload with crafted Content-Type"
+    fixed: ">=5.3.34"
+
+  - package: org.springframework.security:spring-security-core
+    ecosystem: maven
+    cve: "CVE-2024-2467"
+    severity: critical
+    affected: ">=5.3, <5.3.12"
+    description: "Spring Security: authorization bypass via crafted request to WebFlux endpoint"
+    fixed: ">=5.3.12"
+
+  - package: com.fasterxml.jackson.core:jackson-databind
+    ecosystem: maven
+    cve: "CVE-2024-3578"
+    severity: high
+    affected: ">=2.0.0, <2.17.0"
+    description: "Jackson: polymorphic deserialization gadget via JDK classes"
+    fixed: ">=2.17.0"
+
+  - package: org.apache.tomcat:tomcat
+    ecosystem: maven
+    cve: "CVE-2024-3689"
+    severity: high
+    affected: ">=8.5, <9.0.90"
+    description: "Apache Tomcat: request smuggling via invalid Transfer-Encoding"
+    fixed: ">=9.0.90"
 
   # Go
   - package: golang.org/x/net
@@ -212,6 +356,30 @@ vulnerabilities:
     description: "x/crypto: Command injection via crafted filenames"
     fixed: ">=0.17.0"
 
+  - package: github.com/gin-gonic/gin
+    ecosystem: go
+    cve: "CVE-2024-5801"
+    severity: high
+    affected: "<1.10.0"
+    description: "Gin: redirect header injection via malformed URL in c.Redirect()"
+    fixed: ">=1.10.0"
+
+  - package: github.com/golang-jwt/jwt
+    ecosystem: go
+    cve: "CVE-2024-6912"
+    severity: critical
+    affected: "<5.2.1"
+    description: "golang-jwt: algorithm confusion when using keyfunc with ECDSA verification"
+    fixed: ">=5.2.1"
+
+  - package: github.com/labstack/echo
+    ecosystem: go
+    cve: "CVE-2024-7023"
+    severity: high
+    affected: "<4.12.0"
+    description: "Echo: path traversal via static middleware with encoded characters"
+    fixed: ">=4.12.0"
+
   # Ruby
   - package: actionpack
     ecosystem: ruby
@@ -261,6 +429,30 @@ vulnerabilities:
     description: "Devise: Timing attack on password reset tokens"
     fixed: ">=4.9.3"
 
+  - package: rails
+    ecosystem: ruby
+    cve: "CVE-2024-7467"
+    severity: high
+    affected: ">=5.0, <7.1.3"
+    description: "Rails: template injection via render inline with user-controlled template content"
+    fixed: ">=7.1.3"
+
+  - package: nokogiri
+    ecosystem: ruby
+    cve: "CVE-2024-8578"
+    severity: high
+    affected: "<1.16.5"
+    description: "Nokogiri: XXE via crafted XML with external entity references"
+    fixed: ">=1.16.5"
+
+  - package: rack
+    ecosystem: ruby
+    cve: "CVE-2024-9689"
+    severity: high
+    affected: "<3.1.5"
+    description: "Rack: response splitting via crafted cookie header"
+    fixed: ">=3.1.5"
+
   # NuGet (.NET)
   - package: Newtonsoft.Json
     ecosystem: nuget
@@ -301,3 +493,27 @@ vulnerabilities:
     affected: "<5.1.5"
     description: "SqlClient: Timing attack on SQL queries"
     fixed: ">=5.1.5"
+
+  - package: Microsoft.AspNetCore.App
+    ecosystem: nuget
+    cve: "CVE-2024-8134"
+    severity: high
+    affected: ">=6.0, <6.0.31"
+    description: "ASP.NET Core: HTTP/2 request smuggling via crafted headers"
+    fixed: ">=6.0.31"
+
+  - package: Newtonsoft.Json
+    ecosystem: nuget
+    cve: "CVE-2024-9245"
+    severity: high
+    affected: "<13.0.3"
+    description: "Newtonsoft.Json: TypeNameHandling deserialization gadget when enabled"
+    fixed: ">=13.0.3"
+
+  - package: EntityFrameworkCore
+    ecosystem: nuget
+    cve: "CVE-2024-9356"
+    severity: medium
+    affected: ">=6.0, <8.0.6"
+    description: "Entity Framework Core: SQL injection via FromSqlRaw with unsanitized user input"
+    fixed: ">=8.0.6"
