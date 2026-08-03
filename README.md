@@ -1,13 +1,14 @@
 # Analizador de Seguridad de Código
 
 [![CI](https://github.com/antioscar/codsec/actions/workflows/ci.yml/badge.svg)](https://github.com/antioscar/codsec/actions/workflows/ci.yml)
+[![Code Scanning](https://github.com/antioscar/codsec/actions/workflows/codeql.yml/badge.svg)](https://github.com/antioscar/codsec/security/code-scanning)
 [![Python 3.14+](https://img.shields.io/badge/python-3.14+-blue.svg)](https://www.python.org/downloads/)
-[![Tests](https://img.shields.io/badge/tests-279%20passed-brightgreen.svg)](https://github.com/antioscar/codsec)
-[![Coverage](https://img.shields.io/badge/coverage-81%25-green.svg)](https://github.com/antioscar/codsec)
+[![Tests](https://img.shields.io/badge/tests-322%20passed-brightgreen.svg)](https://github.com/antioscar/codsec)
+[![Coverage](https://img.shields.io/badge/coverage-80%25-green.svg)](https://github.com/antioscar/codsec)
+[![Docker](https://img.shields.io/badge/docker-multi--arch-blue.svg)](https://github.com/antioscar/codsec/pkgs/container/codsec)
+[![Release](https://img.shields.io/badge/release-v1.2.0-blue.svg)](https://github.com/antioscar/codsec/releases)
 
-Herramienta de análisis estático de seguridad (SAST) para webapps con escaneo paralelo. Escanea código fuente en Python, JavaScript, TypeScript, PHP, Java, Go, C#, Ruby, Kotlin, Swift y Rust mediante 20 categorías de reglas + análisis de taint (intra e interprocedimental) + dependencias vulnerables (9 formatos, consulta online OSV opcional), e integra inteligencia artificial (LLM) opcional. Incluye reporte de cumplimiento multi-estándar (ISO 27001:2022, ISO 27034, NIST SP 800-53, OWASP Top 10). Genera informes en PDF, HTML, JSON, SARIF, GitLab Code Quality y cumplimiento ISO. Distribuible como ejecutable único con PyInstaller.
-
-**Incluye interfaz gráfica (GUI)** y línea de comandos (CLI).
+**SAST tool** con detección de vulnerabilidades en **11 lenguajes** usando **37 categorías de reglas** + análisis de taint (intra/interprocedimental) + **100 CVEs** en base local (consulta OSV opcional). Incluye cumplimiento multi-estándar (ISO 27001, ISO 27034, NIST 800-53, OWASP Top 10). Reportes en PDF, HTML, JSON, SARIF, GitLab Code Quality. **GUI + CLI + Docker.**
 
 ## Requisitos
 
@@ -24,6 +25,29 @@ python main.py -p tests/samples --no-llm -o demo.pdf
 ```
 
 Esto escanea los samples incluidos y genera `demo.pdf`. Para ejecutar la GUI: `python main_gui.py`.
+
+### Docker
+
+```bash
+docker compose run --rm scan              # Básico
+docker compose --profile full run scan-full  # Todos los formatos
+```
+
+## Capacidades
+
+| Categoría | Detalle |
+|-----------|---------|
+| **Lenguajes** | Python, JavaScript, TypeScript, PHP, Java, Go, C#, Ruby, Kotlin, Swift, Rust |
+| **Reglas** | 37 categorías: SQLi, XSS, CMD, secrets, SSRF, XXE, SSTI, CSRF, JWT, NoSQL, CORS, GraphQL + más |
+| **Taint** | Análisis intra e interprocedimental de flujo de datos (fuente → sink) |
+| **Deps** | 10 formatos de manifiesto + 100 CVEs en base local + consulta OSV online |
+| **Compliance** | ISO 27001:2022, ISO 27034, NIST SP 800-53, OWASP Top 10 |
+| **Outputs** | PDF, HTML, JSON, SARIF v2.1, GitLab Code Quality, Compliance JSON |
+| **GUI** | Dashboard + tabla hallazgos + visor código + compliance + settings |
+| **CI/CD** | Exit codes, SARIF upload (GitHub Code Scanning), GitLab integration |
+| **i18n** | Español + English (87 strings) |
+| **Distribución** | PyInstaller .exe, Docker multi-arch (amd64/arm64) |
+| **IA opcional** | Verificación de hallazgos, análisis semántico, remediación mejorada |
 
 ## Uso
 
@@ -292,7 +316,7 @@ Los campos:
 │       └── remediation.py   # Mejora de remediación con IA
 └── tests/
     ├── samples/             # Código vulnerable (11 lenguajes)
-    └── test_*.py            # 279 tests
+    └── test_*.py            # 322 tests
 ```
 
 ## Cumplimiento ISO 27001:2022
@@ -381,4 +405,4 @@ python main.py -p . --fail-on high --no-llm
 python -m pytest tests/ -v
 ```
 
-279 tests cubriendo: reglas (20 categorías), AST, taint (intra + interprocedimental), dependencias (9 formatos + OSV online, +36 tests deps_online), IA/LLM (+23 tests provider/verifier/semantic/remediation/parsing), PDF, HTML, JSON, SARIF, GitLab Code Quality, compliance multi-estándar (ISO 27001, ISO 27034, NIST 800-53, OWASP Top 10), baseline, supresión, reglas personalizadas, exit codes CI/CD, e2e, GUI (35 tests), 11 lenguajes (Kotlin, Swift, Rust).
+322 tests cubriendo: reglas (37 categorías), AST, taint (intra + interprocedimental), dependencias (10 formatos + OSV online, +36 tests deps_online), IA/LLM (+23 tests provider/verifier/semantic/remediation/parsing), PDF, HTML, JSON, SARIF, GitLab Code Quality, compliance multi-estándar, baseline, supresión, reglas personalizadas, exit codes CI/CD, e2e, GUI (55 tests), 11 lenguajes.
