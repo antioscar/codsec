@@ -17,8 +17,13 @@ class ComplianceTab(QWidget):
         layout = QVBoxLayout(self)
 
         header = QLabel("Cumplimiento de Normas de Seguridad")
-        header.setStyleSheet("font-size:16px; font-weight:bold; color:#7ec8e3; padding:8px 0;")
+        header.setStyleSheet("font-size:16px; font-weight:bold; padding:8px 0;")
         layout.addWidget(header)
+
+        self.empty_label = QLabel("Ejecute un análisis para ver el cumplimiento")
+        self.empty_label.setStyleSheet("color: #6a6a8a; font-size: 16px;")
+        self.empty_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        layout.addWidget(self.empty_label)
 
         self.score_layout = QHBoxLayout()
         layout.addLayout(self.score_layout)
@@ -31,15 +36,16 @@ class ComplianceTab(QWidget):
         self.tree.setColumnWidth(3, 80)
         self.tree.setColumnWidth(4, 120)
         self.tree.setAlternatingRowColors(True)
-        self.tree.setStyleSheet("""
-            QTreeWidget::item { padding: 4px 6px; }
-            QTreeWidget::item:alternate { background: #1e1e36; }
-            QHeaderView::section { background: #2a2a4a; padding: 4px; }
-        """)
         layout.addWidget(self.tree)
+
+        self._theme = "dark"
+
+    def set_theme(self, theme: str):
+        self._theme = theme
 
     def set_compliance(self, report: ScanReport):
         self.tree.clear()
+        self.empty_label.setVisible(False)
 
         for i in reversed(range(self.score_layout.count())):
             self.score_layout.itemAt(i).widget().setParent(None)
@@ -89,8 +95,12 @@ class ComplianceTab(QWidget):
             bar.setValue(int(pct))
             bar.setTextVisible(True)
             bar.setFormat(f"{std_label.split('(')[0].strip()}: {pct}%")
+            is_dark = self._theme == "dark"
+            bar_bg = "#22223a" if is_dark else "#e0e0e0"
+            bar_border = "#3a3a5c" if is_dark else "#cccccc"
+            bar_color = "#c0c0d0" if is_dark else "#212121"
             bar.setStyleSheet(f"""
-                QProgressBar {{ background:#22223a; border:1px solid #3a3a5c; border-radius:4px; height:20px; text-align:center; color:#c0c0d0; font-size:11px; }}
+                QProgressBar {{ background:{bar_bg}; border:1px solid {bar_border}; border-radius:4px; height:20px; text-align:center; color:{bar_color}; font-size:11px; }}
                 QProgressBar::chunk {{ background:{pct_color}; border-radius:3px; }}
             """)
             self.score_layout.addWidget(bar)

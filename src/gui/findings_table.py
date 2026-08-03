@@ -1,8 +1,9 @@
 from __future__ import annotations
+import os
 from PySide6.QtWidgets import (
     QWidget, QVBoxLayout, QHBoxLayout, QSplitter, QTableView,
     QHeaderView, QCheckBox, QComboBox, QLineEdit, QLabel,
-    QAbstractItemView, QGroupBox, QTextEdit,
+    QAbstractItemView, QGroupBox, QTextEdit, QStackedWidget,
 )
 from PySide6.QtCore import Qt, QSortFilterProxyModel, QAbstractTableModel, QModelIndex, Signal
 from PySide6.QtGui import QColor
@@ -60,7 +61,7 @@ class FindingsModel(QAbstractTableModel):
             elif col == 3:
                 return finding.cwe
             elif col == 4:
-                return finding.file_path.split("\\")[-1]
+                return os.path.basename(finding.file_path)
             elif col == 5:
                 return str(finding.line_number)
             elif col == 6:
@@ -126,7 +127,6 @@ class FindingsTable(QWidget):
         self.chk_low.setChecked(True)
 
         for cb in [self.chk_critical, self.chk_high, self.chk_medium, self.chk_low]:
-            cb.setStyleSheet("color: #c0c0d0;")
             cb.toggled.connect(self._apply_filters)
 
         filter_layout.addWidget(self.chk_critical)
@@ -149,6 +149,15 @@ class FindingsTable(QWidget):
         filter_layout.addWidget(self.txt_search)
 
         layout.addWidget(self.filter_widget)
+
+        self.empty_label = QLabel("Ejecute un análisis para ver los hallazgos")
+        self.empty_label.setStyleSheet("color: #6a6a8a; font-size: 16px;")
+        self.empty_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        layout.addWidget(self.empty_label)
+
+        self._content = QWidget()
+        content_layout = QVBoxLayout(self._content)
+        content_layout.setContentsMargins(0, 0, 0, 0)
 
         splitter = QSplitter(Qt.Orientation.Vertical)
 
@@ -204,11 +213,19 @@ class FindingsTable(QWidget):
         splitter.setStretchFactor(0, 1)
         splitter.setStretchFactor(1, 1)
 
-        layout.addWidget(splitter)
+        content_layout.addWidget(splitter)
+        layout.addWidget(self._content)
 
     def set_findings(self, findings: list[Finding]):
         self._findings = findings
         self.model.set_findings(findings)
+
+        has_findings = len(findings) > 0
+        self._content.setVisible(has_findings)
+        self.empty_label.setVisible(not has_findings)
+
+        has_findings = len(findings) > 0
+        self.empty_label.setVisible(not has_findings)
 
         categories = sorted(set(f.category for f in findings))
         self.cmb_category.blockSignals(True)

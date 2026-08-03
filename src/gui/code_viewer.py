@@ -1,6 +1,6 @@
 from __future__ import annotations
 from PySide6.QtWidgets import QPlainTextEdit, QWidget, QHBoxLayout
-from PySide6.QtGui import QPainter, QColor, QFont, QTextFormat
+from PySide6.QtGui import QPainter, QColor, QFont, QFontDatabase, QTextFormat
 from PySide6.QtCore import Qt, QRect
 
 
@@ -21,8 +21,8 @@ class CodeViewer(QPlainTextEdit):
         super().__init__(parent)
         self.setReadOnly(True)
         self.setLineWrapMode(QPlainTextEdit.LineWrapMode.NoWrap)
-        font = QFont("Consolas", 10)
-        font.setStyleHint(QFont.StyleHint.Monospace)
+        font = QFont(QFontDatabase.systemFont(QFontDatabase.SystemFont.FixedFont))
+        font.setPointSize(10)
         self.setFont(font)
 
         self.line_number_area = LineNumberArea(self)

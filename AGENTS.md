@@ -117,6 +117,10 @@ In `src/rules/parser.py` `_get_language()`:
 - `.gitignore` incluye: `node_modules/`, `dist/`, `build/`, `cache/`, `.pytest_cache/`, `.coverage`, `__pycache__/`, `*.pyc`, `informe_seguridad.*`.
 - El push dispara el CI (`.github/workflows/ci.yml`) que corre los 208 tests con coverage gate ≥75%.
 
+## Roadmap
+
+Ver `ROADMAP.md` para el estado de fases completadas, prioridades futuras y tareas pendientes.
+
 ## ISO Compliance
 
 - `src/report/compliance.py` auto-loads all `*.yaml` from `config/compliance/`.

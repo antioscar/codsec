@@ -1,5 +1,10 @@
 # Analizador de Seguridad de Código
 
+[![CI](https://github.com/antioscar/codsec/actions/workflows/ci.yml/badge.svg)](https://github.com/antioscar/codsec/actions/workflows/ci.yml)
+[![Python 3.14+](https://img.shields.io/badge/python-3.14+-blue.svg)](https://www.python.org/downloads/)
+[![Tests](https://img.shields.io/badge/tests-208%20passed-brightgreen.svg)](https://github.com/antioscar/codsec)
+[![Coverage](https://img.shields.io/badge/coverage-76%25-yellow.svg)](https://github.com/antioscar/codsec)
+
 Herramienta de análisis estático de seguridad (SAST) para webapps con escaneo paralelo. Escanea código fuente en Python, JavaScript, TypeScript, PHP, Java, Go, C# y Ruby mediante 20 categorías de reglas + análisis de taint (intra e interprocedimental) + dependencias vulnerables (9 formatos, consulta online OSV opcional), e integra inteligencia artificial (LLM) opcional. Incluye reporte de cumplimiento multi-estándar (ISO 27001:2022, ISO 27034, NIST SP 800-53, OWASP Top 10). Genera informes en PDF, HTML, JSON, SARIF, GitLab Code Quality y cumplimiento ISO. Distribuible como ejecutable único con PyInstaller.
 
 **Incluye interfaz gráfica (GUI)** y línea de comandos (CLI).
@@ -9,6 +14,17 @@ Herramienta de análisis estático de seguridad (SAST) para webapps con escaneo 
 - Python 3.14+
 - `pip install -r requirements.txt`
 
+## Quickstart
+
+```bash
+git clone https://github.com/antioscar/codsec.git
+cd codsec
+pip install -r requirements.txt
+python main.py -p tests/samples --no-llm -o demo.pdf
+```
+
+Esto escanea los samples incluidos y genera `demo.pdf`. Para ejecutar la GUI: `python main_gui.py`.
+
 ## Uso
 
 ### Interfaz gráfica (GUI)
@@ -17,14 +33,19 @@ Herramienta de análisis estático de seguridad (SAST) para webapps con escaneo 
 python main_gui.py
 ```
 
-- Seleccioná la carpeta del proyecto a analizar (automáticamente inicia el escaneo)
-- Dashboard con resumen por severidad y gráfico de barras
+**Pestañas:**
+- Dashboard con KPIs (severidad + dependencias vulnerables), gráfico de barras y acciones principales
 - Tabla de hallazgos filtrable por severidad, categoría y búsqueda de texto
 - Visor de código con la línea afectada resaltada
 - Detalle con descripción y pasos de remediación
+- Pestaña de cumplimiento multi-estándar (ISO 27001, ISO 27034, NIST 800-53, OWASP Top 10)
 - Configuración: 8 lenguajes, severidad mínima, exclusiones, IA/LLM, baseline, reglas personalizadas, CVE online
-- Tema oscuro / claro (toggle en toolbar)
-- Exportación: PDF, HTML, SARIF (menú Exportar en toolbar)
+- Tema oscuro / claro con estilos completos en todos los componentes
+- Exportación: PDF, HTML, SARIF (Ctrl+E para PDF)
+- Atajos: `Ctrl+O` seleccionar carpeta, `Ctrl+R` analizar, `Ctrl+E` exportar PDF
+- Persistencia de configuración: última carpeta, geometría de ventana y tema
+
+> **Tip:** Generá screenshots con la GUI sobre `tests/samples` para tu portafolio. Las 4 pestañas con resultados muestran todo el producto.
 
 ### Línea de comandos (CLI)
 
@@ -58,6 +79,9 @@ python main.py -p <ruta_del_proyecto> -o <informe.pdf>
 ### Ejemplos
 
 ```bash
+# Demo rápido (scan de tests/samples incluidos)
+python main.py -p tests/samples --no-llm -o demo.pdf
+
 # Analizar todo el proyecto
 python main.py -p ./mi_app -o informe.pdf
 

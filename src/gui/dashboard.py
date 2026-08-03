@@ -23,24 +23,6 @@ SEVERITY_COLORS = {
     Severity.LOW: "#228B22",
 }
 
-ACTION_BTN_STYLE = """
-    QPushButton {
-        font-size: 13px; font-weight: bold;
-        padding: 12px 24px; border-radius: 6px;
-        min-height: 44px; min-width: 180px;
-    }
-    QPushButton:enabled {
-        background-color: #3a3a5c; color: #c0c0d0;
-        border: 1px solid #4a4a6c;
-    }
-    QPushButton:enabled:hover {
-        background-color: #4a4a7c; color: #ffffff;
-    }
-    QPushButton:disabled {
-        background-color: #2a2a3c; color: #5a5a7a;
-    }
-"""
-
 
 class KpiCard(QFrame):
     def __init__(self, title: str, value: str, color: str, parent=None):
@@ -97,6 +79,10 @@ class Dashboard(QWidget):
         self._report: ScanReport | None = None
         self._has_folder = False
         self._has_report = False
+        self._theme = "dark"
+
+    def set_theme(self, theme: str):
+        self._theme = theme
 
     def _setup_actions_bar(self):
         self._actions = QHBoxLayout()
@@ -104,28 +90,23 @@ class Dashboard(QWidget):
         self._actions.setSpacing(12)
 
         self.btn_select = QPushButton("📂 Seleccionar proyecto")
-        self.btn_select.setStyleSheet(ACTION_BTN_STYLE)
+        self.btn_select.setObjectName("dashboardBtn")
         self.btn_select.clicked.connect(self.selectFolderRequested.emit)
         self._actions.addWidget(self.btn_select)
 
         self.btn_scan = QPushButton("▶ Analizar")
-        self.btn_scan.setStyleSheet(ACTION_BTN_STYLE)
+        self.btn_scan.setObjectName("dashboardBtn")
         self.btn_scan.setEnabled(False)
         self.btn_scan.clicked.connect(self.scanRequested.emit)
         self._actions.addWidget(self.btn_scan)
 
         self.btn_pdf = QPushButton("📄 Generar PDF")
-        self.btn_pdf.setStyleSheet(ACTION_BTN_STYLE)
+        self.btn_pdf.setObjectName("dashboardBtn")
         self.btn_pdf.setEnabled(False)
         self.btn_pdf.clicked.connect(self.pdfRequested.emit)
         self._actions.addWidget(self.btn_pdf)
 
         self.chk_llm = QCheckBox("🤖 Análisis con IA")
-        self.chk_llm.setStyleSheet(
-            "QCheckBox { font-size: 13px; font-weight: bold; color: #9a9aba; padding: 8px; }"
-            "QCheckBox::indicator { width: 20px; height: 20px; }"
-            "QCheckBox:checked { color: #7ec8e3; }"
-        )
         self.chk_llm.toggled.connect(self.llmToggled.emit)
         self._actions.addWidget(self.chk_llm)
 
@@ -152,11 +133,13 @@ class Dashboard(QWidget):
                 widget.deleteLater()
 
         sev_counts = report.by_severity
+        dep_count = sum(1 for f in report.findings if f.category == "vulnerable_dependency")
         cards_data = [
             ("CRÍTICAS", str(len(sev_counts[Severity.CRITICAL])), SEVERITY_COLORS[Severity.CRITICAL]),
             ("ALTAS", str(len(sev_counts[Severity.HIGH])), SEVERITY_COLORS[Severity.HIGH]),
             ("MEDIAS", str(len(sev_counts[Severity.MEDIUM])), SEVERITY_COLORS[Severity.MEDIUM]),
             ("BAJAS", str(len(sev_counts[Severity.LOW])), SEVERITY_COLORS[Severity.LOW]),
+            ("DEP. VULN.", str(dep_count), "#FF6347"),
             ("TOTAL", str(report.total_findings), "#569cd6"),
         ]
         for title, value, color in cards_data:
@@ -176,8 +159,14 @@ class Dashboard(QWidget):
         chart.setTitle("Distribución por severidad")
         chart.setAnimationOptions(QChart.AnimationOption.SeriesAnimations)
 
+        is_dark = self._theme == "dark"
+        bar_color = "#569cd6" if is_dark else "#1976d2"
+        label_color = QColor("#a0a0b0") if is_dark else QColor("#616161")
+        bg_color = QColor("#1e1e2e") if is_dark else QColor("#f5f5f5")
+        title_color = QColor("#c0c0d0") if is_dark else QColor("#212121")
+
         bar_set = QBarSet("Hallazgos")
-        bar_set.setColor("#569cd6")
+        bar_set.setColor(bar_color)
 
         categories = []
         for sev in (Severity.CRITICAL, Severity.HIGH, Severity.MEDIUM, Severity.LOW):
@@ -190,20 +179,20 @@ class Dashboard(QWidget):
 
         axis_x = QBarCategoryAxis()
         axis_x.append(categories)
-        axis_x.setLabelsColor(QColor("#a0a0b0"))
+        axis_x.setLabelsColor(label_color)
         chart.addAxis(axis_x, Qt.AlignmentFlag.AlignBottom)
         series.attachAxis(axis_x)
 
         axis_y = QValueAxis()
         max_val = max(max(len(sev_counts[s]) for s in sev_counts), 1)
         axis_y.setRange(0, max_val + 2)
-        axis_y.setLabelsColor(QColor("#a0a0b0"))
+        axis_y.setLabelsColor(label_color)
         axis_y.setLabelFormat("%d")
         chart.addAxis(axis_y, Qt.AlignmentFlag.AlignLeft)
         series.attachAxis(axis_y)
 
-        chart.setBackgroundBrush(QColor("#1e1e2e"))
-        chart.setTitleBrush(QColor("#c0c0d0"))
+        chart.setBackgroundBrush(bg_color)
+        chart.setTitleBrush(title_color)
         chart.legend().setVisible(False)
 
         self.chart_view.setChart(chart)

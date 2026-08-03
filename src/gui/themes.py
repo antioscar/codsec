@@ -98,6 +98,14 @@ QPushButton:hover {
 QPushButton:pressed {
     background-color: #2a2a4a;
 }
+QPushButton#dashboardBtn {
+    font-size: 13px;
+    font-weight: bold;
+    padding: 12px 24px;
+    border-radius: 6px;
+    min-height: 44px;
+    min-width: 180px;
+}
 QLabel {
     color: #c0c0d0;
     font-size: 12px;
@@ -202,6 +210,25 @@ QHeaderView::section {
     font-weight: bold;
     font-size: 11px;
 }
+QTreeWidget {
+    background-color: #1e1e2e;
+    alternate-background-color: #252535;
+    color: #e0e0e0;
+    border: 1px solid #3a3a5a;
+    font-size: 12px;
+}
+QTreeWidget::item {
+    padding: 4px 6px;
+}
+QTreeWidget::item:selected {
+    background-color: #264f78;
+    color: #ffffff;
+}
+QChartView {
+    background-color: #1e1e2e;
+    border: 1px solid #3a3a5a;
+    border-radius: 4px;
+}
 """
 
 LIGHT_QSS = """
@@ -301,6 +328,14 @@ QPushButton:hover {
 }
 QPushButton:pressed {
     background-color: #cccccc;
+}
+QPushButton#dashboardBtn {
+    font-size: 13px;
+    font-weight: bold;
+    padding: 12px 24px;
+    border-radius: 6px;
+    min-height: 44px;
+    min-width: 180px;
 }
 QLabel {
     color: #424242;
@@ -405,6 +440,25 @@ QHeaderView::section {
     border: 1px solid #e0e0e0;
     font-weight: bold;
     font-size: 11px;
+}
+QTreeWidget {
+    background-color: #ffffff;
+    alternate-background-color: #f5f5f5;
+    color: #212121;
+    border: 1px solid #e0e0e0;
+    font-size: 12px;
+}
+QTreeWidget::item {
+    padding: 4px 6px;
+}
+QTreeWidget::item:selected {
+    background-color: #bbdefb;
+    color: #212121;
+}
+QChartView {
+    background-color: #f5f5f5;
+    border: 1px solid #e0e0e0;
+    border-radius: 4px;
 }
 """
 

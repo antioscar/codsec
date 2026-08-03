@@ -4,8 +4,9 @@ from PySide6.QtWidgets import (
     QMainWindow, QToolBar, QTabWidget, QStatusBar, QFileDialog,
     QProgressBar, QLabel, QMessageBox, QWidget, QVBoxLayout, QMenu,
 )
-from PySide6.QtGui import QAction, QIcon
-from PySide6.QtCore import Qt, QSize
+from PySide6.QtGui import QAction, QIcon, QKeySequence
+from PySide6.QtCore import Qt, QSize, QSettings
+from PySide6.QtWidgets import QStyle
 
 from src.models import Severity, ScanReport
 from src.config import load_config
@@ -23,6 +24,8 @@ class MainWindow(QMainWindow):
         self.setWindowTitle("Analizador de Seguridad de Código")
         self.setGeometry(100, 100, 1280, 800)
 
+        self._settings = QSettings("CodSec", "AnalizadorSeguridad")
+
         self._config = load_config()
         self._theme = self._config.get("theme", "dark")
         self._target_path: str | None = None
@@ -35,28 +38,39 @@ class MainWindow(QMainWindow):
         self._setup_statusbar()
         self._connect_dashboard()
 
+        self._restore_state()
+
     def _read_llm_enabled(self) -> bool:
         from src.llm.provider import is_llm_enabled
         return is_llm_enabled()
 
     def _setup_toolbar(self):
         toolbar = QToolBar("Principal")
-        toolbar.setIconSize(QSize(16, 16))
+        toolbar.setIconSize(QSize(20, 20))
         toolbar.setMovable(False)
         self.addToolBar(toolbar)
 
-        select_action = QAction("📂 Seleccionar carpeta", self)
+        style = self.style()
+        icon_open = style.standardIcon(QStyle.StandardPixmap.SP_DirOpenIcon)
+        icon_play = style.standardIcon(QStyle.StandardPixmap.SP_MediaPlay)
+        icon_stop = style.standardIcon(QStyle.StandardPixmap.SP_MediaStop)
+        icon_file = style.standardIcon(QStyle.StandardPixmap.SP_FileIcon)
+        icon_export = style.standardIcon(QStyle.StandardPixmap.SP_FileDialogDetailedView)
+
+        select_action = QAction(icon_open, "Seleccionar carpeta", self)
+        select_action.setShortcut(QKeySequence("Ctrl+O"))
         select_action.triggered.connect(self._select_folder)
         toolbar.addAction(select_action)
 
         toolbar.addSeparator()
 
-        self.scan_action = QAction("▶ Analizar", self)
+        self.scan_action = QAction(icon_play, "Analizar", self)
+        self.scan_action.setShortcut(QKeySequence("Ctrl+R"))
         self.scan_action.triggered.connect(self._start_scan)
         self.scan_action.setEnabled(False)
         toolbar.addAction(self.scan_action)
 
-        self.cancel_action = QAction("⏹ Cancelar", self)
+        self.cancel_action = QAction(icon_stop, "Cancelar", self)
         self.cancel_action.triggered.connect(self._cancel_scan)
         self.cancel_action.setEnabled(False)
         toolbar.addAction(self.cancel_action)
@@ -75,38 +89,40 @@ class MainWindow(QMainWindow):
 
         toolbar.addSeparator()
 
-        self.pdf_action = QAction("📄 Generar PDF", self)
+        self.pdf_action = QAction(icon_file, "Generar PDF", self)
+        self.pdf_action.setShortcut(QKeySequence("Ctrl+E"))
         self.pdf_action.triggered.connect(self._generate_pdf)
         self.pdf_action.setEnabled(False)
 
-        export_menu = QMenu("📤 Exportar", self)
+        export_menu = QMenu("Exportar", self)
         export_menu.addAction(self.pdf_action)
-        html_action = QAction("🌐 HTML", self)
+        html_action = QAction("HTML", self)
         html_action.triggered.connect(self._generate_html)
         html_action.setEnabled(False)
         export_menu.addAction(html_action)
         self._html_action = html_action
-        sarif_action = QAction("📋 SARIF", self)
+        sarif_action = QAction("SARIF", self)
         sarif_action.triggered.connect(self._generate_sarif)
         sarif_action.setEnabled(False)
         export_menu.addAction(sarif_action)
         self._sarif_action = sarif_action
 
-        self._export_action = QAction("📤 Exportar", self)
+        self._export_action = QAction(icon_export, "Exportar", self)
         self._export_action.setMenu(export_menu)
         self._export_action.setEnabled(False)
         toolbar.addAction(self._export_action)
 
         toolbar.addSeparator()
 
-        theme_text = "🌙 Tema Claro" if self._theme == "dark" else "☀️ Tema Oscuro"
+        theme_text = "☀️ Tema Claro" if self._theme == "dark" else "🌙 Tema Oscuro"
         self.theme_action = QAction(theme_text, self)
         self.theme_action.triggered.connect(self._toggle_theme)
         toolbar.addAction(self.theme_action)
 
         toolbar.addSeparator()
 
-        settings_action = QAction("⚙ Configuración", self)
+        icon_settings = style.standardIcon(QStyle.StandardPixmap.SP_FileDialogDetailedView)
+        settings_action = QAction("Configuración", self)
         settings_action.triggered.connect(lambda: self.tab_widget.setCurrentIndex(2))
         toolbar.addAction(settings_action)
 
@@ -146,13 +162,14 @@ class MainWindow(QMainWindow):
         self.status_bar.addPermanentWidget(self.progress_bar)
 
     def _select_folder(self):
-        folder = QFileDialog.getExistingDirectory(self, "Seleccionar proyecto")
+        last_dir = self._settings.value("lastFolder", "")
+        folder = QFileDialog.getExistingDirectory(self, "Seleccionar proyecto", last_dir)
         if folder:
             self._target_path = folder
+            self._settings.setValue("lastFolder", folder)
             self.scan_action.setEnabled(True)
             self.dashboard_tab.set_has_folder(True)
-            self.status_label.setText(f"Proyecto: {folder}")
-            self._start_scan()
+            self.status_label.setText(f"Proyecto: {folder} — Presione 'Analizar' para iniciar")
 
     def _start_scan(self):
         if not self._target_path:
@@ -318,8 +335,10 @@ class MainWindow(QMainWindow):
         app = QApplication.instance()
         if app:
             apply_theme(app, self._theme)
+        self.dashboard_tab.set_theme(self._theme)
+        self.compliance_tab.set_theme(self._theme)
 
-        theme_text = "🌙 Tema Claro" if self._theme == "dark" else "☀️ Tema Oscuro"
+        theme_text = "☀️ Tema Claro" if self._theme == "dark" else "🌙 Tema Oscuro"
         self.theme_action.setText(theme_text)
 
     def _toggle_llm(self, checked: bool):
@@ -349,3 +368,28 @@ class MainWindow(QMainWindow):
     def _load_settings(self):
         config = load_config()
         self._theme = config.get("theme", self._theme)
+
+    def _restore_state(self):
+        geometry = self._settings.value("windowGeometry")
+        if geometry:
+            self.restoreGeometry(geometry)
+        state = self._settings.value("windowState")
+        if state:
+            self.restoreState(state)
+        last_folder = self._settings.value("lastFolder", "")
+        if last_folder and os.path.isdir(last_folder):
+            self._target_path = last_folder
+            self.scan_action.setEnabled(True)
+            self.dashboard_tab.set_has_folder(True)
+            self.status_label.setText(f"Proyecto: {last_folder} — Presione 'Analizar' para iniciar")
+
+    def _save_state(self):
+        self._settings.setValue("windowGeometry", self.saveGeometry())
+        self._settings.setValue("windowState", self.saveState())
+
+    def closeEvent(self, event):
+        if self._worker and self._worker.isRunning():
+            self._worker.cancel()
+            self._worker.wait(3000)
+        self._save_state()
+        super().closeEvent(event)
